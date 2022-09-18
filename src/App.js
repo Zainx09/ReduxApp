@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react"
+import { useState } from "react"
+import "./App.css"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+import Header from "./components/header"
+import Footer from "./components/footer"
+import HomePage from './components/homePage'
+import ContactPage from "./components/contactPage"
+
+
+
+
+
+const App= () => {
+
+  const [navigate, setNavigate] = useState(0)
+  
+  return(
+    <div className='container'>
+
+      <Header setNavigate={setNavigate}/>
+      {navigate === 0 ? <HomePage /> : <ContactPage />}
+      <Footer />
+
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

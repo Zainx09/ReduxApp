@@ -8,7 +8,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
+  .abc{
     animation: App-logo-spin infinite 20s linear;
   }
 }
@@ -36,3 +36,49 @@
     transform: rotate(360deg);
   }
 }
+
+
+.container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.btnDiv{
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
+  width: fit-content;
+  height: fit-content;
+  border-radius: 5%;
+  background-color: #dee0ee;
+}
+
+.btn{
+  border-radius: 3px ;
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: row;
+  width:45px;
+  height:40px;
+  background: #dee0ee;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 5px;
+  font-size: 20px;
+
+}
+
+.btn:hover{
+  background: #575b71;
+  color: #fff;
+}
+
+.counter{
+  height: 40px;
+  background: #fff;
+}
+
+
