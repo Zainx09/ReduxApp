@@ -19,75 +19,74 @@ import {
   View,
 } from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from "react-redux";
+import { Toast } from '@ant-design/react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import { setUser } from './src/actions';
 
-import { getNews, updateNews } from './src/actions';
+import LoginScreen from './src/screens/login';
+import HomeScreen from './src/screens/home';
 
 
 const App = (props) => {
-  const [data , setData] = useState('abcd')
+
+  const [isLogin , setIsLogin] = useState(false);
+
+  const storeData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value)
+      await AsyncStorage.setItem('userInfo', jsonValue)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('userInfo')
+      return jsonValue != null ? props.setUser(JSON.parse(jsonValue)) : null;
+    } catch(e) {
+      // error reading value
+    }
+  }
 
   useEffect(()=>{
-    if(props.data){
-      alert(JSON.stringify(props.data))
+    getData();
+  },[])
+
+  useEffect(()=>{
+    if(props.user){
+      console.log(props.user)
+      storeData(props.user);
+      setIsLogin(true)
+    }else{
+      setIsLogin(false)
     }
-    setData(props.data)
-  },[props.data])
+  },[props.user])
 
   return (
-    <View style={{border:'2px solid red', height:'100%' , width:'100%'}}>
-      <Button title='click me' onPress={()=>{props.getNews()}}></Button>
-      <Button title='click me' onPress={()=>{props.updateNews()}}></Button>
-
-      {/* <Text>{data}</Text> */}
+    <View style={{borderWidth:5 , height:'100%' , width:'100%'}}>
+      {isLogin ? <HomeScreen /> : <LoginScreen />}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
 
 const mapStateToProps = (state) =>{
   return {
-    data: state.news,
-  }
+      user: state.user,
+      loading : state.loading
+    }
 }
 
-const mapDispatchToProps =(dispatch)=>{
+const mapDispatchToProps=(dispatch)=>{
   return{
-    getNews:()=>{
-      dispatch(getNews())
+    setUser:(user)=>{
+      dispatch(setUser(user))
     },
-    updateNews:()=>{
-      dispatch(updateNews())
+  
     }
+}
 
-  }
-  // getNews,
-};
 export default connect(mapStateToProps,mapDispatchToProps)(App);

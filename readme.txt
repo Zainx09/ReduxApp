@@ -14,3 +14,6 @@ npm install react-redux
 npm install redux-saga --legacy-peer-deps
 
 npm install --save-dev redux-devtools
+
+////firebase v9
+npm i firebase

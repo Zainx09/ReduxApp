@@ -1,8 +1,8 @@
 
 npx react-native init MainApp
 
-////run emulator from cmd
-c:/Users/janedoe/Library/Android/sdk/emulator/emulator -avd Pixel_2_API_31
+////run emulator from cmd with internet working
+c:/Users/zainulabidin/AppData/Local/Android/sdk/emulator/emulator -avd Pixel_2_API_31 -dns-server 8.8.8.8
 
 Run instructions for Android:
     • Have an Android emulator running (quickest way to get started), or a device connected.

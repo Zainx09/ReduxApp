@@ -9,6 +9,15 @@ const reducer = (state = {}, action) => {
         case 'UPDATE_RECEIVED':
             return { ...state, news:'update news', loading: false }
 
+        case 'LOGIN_REQUEST':
+            return { ...state , loading : true }
+
+        case 'SET_USER':
+            return {...state , loading : false , user:action.user}
+        
+        case 'DEL_USER':
+            return {...state , loading : false , user:undefined}
+
       default: 
            return state;
     }
