@@ -14,7 +14,7 @@ const HomeScreen = (props) => {
     try {
       await AsyncStorage.removeItem('userInfo')
       props.delUser()
-    } catch(e) {
+    }catch(e) {
       console.log(e)
     } 
   }
@@ -46,26 +46,41 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
   },
+  buttonText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 16,
+  },
   
 })
 
 const mapStateToProps = (state) =>{
-    return {
-        user: state.user,
-        loading : state.loading
-      }
+  return {
+      user: state.user,
+    }
 }
 
-const mapDispatchToProps=(dispatch)=>{
-    return{
-      setUser:(user)=>{
-        dispatch(setUser(user))
-      },
-      delUser:()=>{
-        dispatch(delUser())
-      },
-    
-      }
+const mapDispatchToProps = {
+  delUser
 }
+
+// const mapStateToProps = (state) =>{
+//     return {
+//         user: state.user,
+//         loading : state.loading
+//       }
+// }
+
+// const mapDispatchToProps=(dispatch)=>{
+//     return{
+//       setUser:(user)=>{
+//         dispatch(setUser(user))
+//       },
+//       delUser:()=>{
+//         dispatch(delUser())
+//       },
+    
+//       }
+// }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)

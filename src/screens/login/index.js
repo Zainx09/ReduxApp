@@ -6,7 +6,7 @@ import {Button , Toast} from '@ant-design/react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { setUser } from '../../actions';
+import { setUser , loginRequest } from '../../actions';
 
 //https://firebase.google.com/docs/auth/web/start
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -40,17 +40,19 @@ const LoginScreen = (props) => {
     e.preventDefault();
     console.log('logging In . . .')
 
-    signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user.email);
-        props.setUser(user)
-    })
-    .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(error.message)
-    });
+    props.loginRequest(email, password)
+
+    // signInWithEmailAndPassword(auth, email, password)
+    // .then((userCredential) => {
+    //     const user = userCredential.user;
+    //     console.log(user.email);
+    //     props.setUser(user)
+    // })
+    // .catch((error) => {
+    //     const errorCode = error.code;
+    //     const errorMessage = error.message;
+    //     console.log(error.message)
+    // });
   }
 
   return (
@@ -145,17 +147,20 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) =>{
     return {
         user: state.user,
-        loading : state.loading
       }
 }
 
-const mapDispatchToProps=(dispatch)=>{
-    return{
-      setUser:(user)=>{
-        dispatch(setUser(user))
-      },
-    
-      }
+const mapDispatchToProps = {
+  loginRequest
 }
+
+// const mapDispatchToProps=(dispatch)=>{
+//     return{
+//       setUser:(user)=>{
+//         dispatch(setUser(user))
+//       },
+    
+//       }
+// }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen)

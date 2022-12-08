@@ -1,4 +1,4 @@
-import { put, takeLatest, all } from 'redux-saga/effects';
+import { put, takeLatest, all,call } from 'redux-saga/effects';
 import {
     Provider,
     Button,
@@ -32,38 +32,47 @@ function* setUser(action){
 }
 
 
-// function* loginRequest(action) {
-//     //abcd@gmail.com
-//     //123456
-//     const {email , password} = action
-//     try{
-//         const userCredential = yield signInWithEmailAndPassword(auth, email, password)
-//         .then(response => response.json())
+function* loginRequest(action) {
+    //abcd@gmail.com
+    //123456
+    const {email , password} = action
+    try{
+        // const userCredential = yield signInWithEmailAndPassword(auth, email, password)
 
-//         yield put({ type: "SET_USER" , user:userCredential.user});
+        const response = yield call(() => signInWithEmailAndPassword(auth, email, password))
+        // .then(response => response.json())
+
+        // alert(JSON.stringify(response))
+
+        if(response){
+            yield put({ type: "SET_USER" , user:response.user});
+        }
+       
+        // console.log(userCredential.user)
         
-//         // signInWithEmailAndPassword(auth, email, password)
-//         // .then((userCredential) => {
-//         //     // Signed in 
-//         //     const user = userCredential.user;
-//         //     console.log(user.email)
-//         //     loginApproved(user)
-//         // })
-//         // .catch((error) => {
-//         //     alert('Operation Failed!')
-//         //     console.log(error.message)
-//         // });
+        // signInWithEmailAndPassword(auth, email, password)
+        // .then((userCredential) => {
+        //     // Signed in 
+        //     const user = userCredential.user;
+        //     console.log(user.email)
+        //     // loginApproved(user)
+        // })
+        // .catch((error) => {
+        //     alert('Operation Failed!')
+        //     console.log(error.message)
+        // });
 
-//     }catch(error){
-//         Toast.fail('Failed to Connect!')
-//     }
+    }catch(error){
+        console.log(error)
+        Toast.fail('Failed to Connect!')
+    }
     
-// }
+}
 
 function* actionWatcher() {
     yield takeLatest('GET_NEWS', fetchNews)
     yield takeLatest('UPDATE_NEWS', updateNews)
-    // yield takeLatest('LOGIN_REQUEST' , loginRequest)
+    yield takeLatest('LOGIN_REQUEST' , loginRequest)
     // yield takeLatest('SET_USER' , setUser)
     
 }

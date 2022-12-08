@@ -48,6 +48,7 @@ const App = (props) => {
       return jsonValue != null ? props.setUser(JSON.parse(jsonValue)) : null;
     } catch(e) {
       // error reading value
+      console.log(e)
     }
   }
 
@@ -76,17 +77,20 @@ const App = (props) => {
 const mapStateToProps = (state) =>{
   return {
       user: state.user,
-      loading : state.loading
     }
 }
 
-const mapDispatchToProps=(dispatch)=>{
-  return{
-    setUser:(user)=>{
-      dispatch(setUser(user))
-    },
-  
-    }
+const mapDispatchToProps = {
+  setUser
 }
+
+// const mapDispatchToProps=(dispatch)=>{
+//   return{
+//     setUser:(user)=>{
+//       dispatch(setUser(user))
+//     },
+  
+//     }
+// }
 
 export default connect(mapStateToProps,mapDispatchToProps)(App);
