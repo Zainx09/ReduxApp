@@ -4,12 +4,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from "react-redux";
 
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import {Button , Toast} from '@ant-design/react-native';
+import {Button , Toast, Provider} from '@ant-design/react-native';
 
 import {delUser} from "../../actions"
+import TabScreen from './components/TabScreen';
+import NewEventModal from './components/modals/NewEventModal';
+import BluetoothScan from "../../bluetoothComponent/BluetoothScan";
 
 const HomeScreen = (props) => {
-
+  
   handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('userInfo')
@@ -20,14 +23,12 @@ const HomeScreen = (props) => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text>HELLO</Text>
-      <TouchableOpacity
-          onPress={handleLogout}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
+    <View style={{flex:1}}>
+      <Provider>
+        <TabScreen />
+        <NewEventModal />
+        <BluetoothScan />
+      </Provider>
     </View>
   )
 }
@@ -63,24 +64,5 @@ const mapStateToProps = (state) =>{
 const mapDispatchToProps = {
   delUser
 }
-
-// const mapStateToProps = (state) =>{
-//     return {
-//         user: state.user,
-//         loading : state.loading
-//       }
-// }
-
-// const mapDispatchToProps=(dispatch)=>{
-//     return{
-//       setUser:(user)=>{
-//         dispatch(setUser(user))
-//       },
-//       delUser:()=>{
-//         dispatch(delUser())
-//       },
-    
-//       }
-// }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)

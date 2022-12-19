@@ -1,26 +1,40 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-
-//https://firebase.google.com/docs/auth/web/start
+import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from 'firebase/firestore/lite';
+import { getFunctions } from 'firebase/functions';
+import { getAnalytics } from "firebase/analytics";
 
 
 
 // Your web app's Firebase configuration
+// const firebaseConfig = {
+//   apiKey: "AIzaSyCDyhZOLP33TsoGrmoF3t9DyvAOf87nNEU",
+//   authDomain: "scannerapp-34f4f.firebaseapp.com",
+//   projectId: "scannerapp-34f4f",
+//   storageBucket: "scannerapp-34f4f.appspot.com",
+//   messagingSenderId: "876077875332",
+//   appId: "1:876077875332:web:1c4b079515cadfa14c02d1",
+// };
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDuxCkcJzZQNM3XzLefVVWFIHqMbLif2ug",
-  authDomain: "scanner-app-d1238.firebaseapp.com",
-  projectId: "scanner-app-d1238",
-  storageBucket: "scanner-app-d1238.appspot.com",
-  messagingSenderId: "326772469561",
-  appId: "1:326772469561:web:fdfdae0192f2c8082a82e8"
+  apiKey: "AIzaSyCYO0pm2ZsKa8dUmK8z164xLx7Usj-tcyU",
+  authDomain: "react-native-logs.firebaseapp.com",
+  projectId: "react-native-logs",
+  storageBucket: "react-native-logs.appspot.com",
+  messagingSenderId: "204109714442",
+  appId: "1:204109714442:web:eedfcbd056113723c0fbf3",
+  measurementId: "G-FR4PS8EJKQ"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+export const functions = getFunctions(app);
+

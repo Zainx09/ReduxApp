@@ -23,20 +23,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from "react-redux";
 import { Toast } from '@ant-design/react-native';
 
-import { setUser } from './src/actions';
+import { setUser, fetchEvents, fetchPoints } from './src/actions';
 
 import LoginScreen from './src/screens/login';
 import HomeScreen from './src/screens/home';
+import Loader from './src/screens/home/components/widgets/loader';
 
 
 const App = (props) => {
 
-  const [isLogin , setIsLogin] = useState(false);
+  const [isLogin , setIsLogin] = useState(undefined);
 
   const storeData = async (value) => {
     try {
       const jsonValue = JSON.stringify(value)
       await AsyncStorage.setItem('userInfo', jsonValue)
+      setIsLogin(true)
     } catch (e) {
       console.log(e)
     }
@@ -45,8 +47,13 @@ const App = (props) => {
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('userInfo')
-      return jsonValue != null ? props.setUser(JSON.parse(jsonValue)) : null;
-    } catch(e) {
+      if(jsonValue != null){
+        props.setUser(JSON.parse(jsonValue));
+        setIsLogin(true)
+      }else{
+        setIsLogin(false)
+      }
+    }catch(e) {
       // error reading value
       console.log(e)
     }
@@ -54,21 +61,24 @@ const App = (props) => {
 
   useEffect(()=>{
     getData();
+    // props.fetchEvents()
   },[])
 
   useEffect(()=>{
     if(props.user){
-      console.log(props.user)
+      props.fetchEvents(props.user.uid)
+      props.fetchPoints(props.user.uid)
+      // alert(props.user.uid)
       storeData(props.user);
-      setIsLogin(true)
     }else{
-      setIsLogin(false)
+      // setIsLogin(false)
+      getData();
     }
   },[props.user])
 
   return (
-    <View style={{borderWidth:5 , height:'100%' , width:'100%'}}>
-      {isLogin ? <HomeScreen /> : <LoginScreen />}
+    <View style={{flex:1}}>
+      {isLogin===true?<HomeScreen />:isLogin===false?<LoginScreen />:<Loader />}
     </View>
   );
 };
@@ -81,7 +91,9 @@ const mapStateToProps = (state) =>{
 }
 
 const mapDispatchToProps = {
-  setUser
+  setUser,
+  fetchEvents,
+  fetchPoints
 }
 
 // const mapDispatchToProps=(dispatch)=>{

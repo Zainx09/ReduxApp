@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/core'
 import React, { useEffect, useState } from 'react'
 import { connect } from "react-redux";
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard } from 'react-native'
 import {Button , Toast} from '@ant-design/react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,6 +11,8 @@ import { setUser , loginRequest } from '../../actions';
 //https://firebase.google.com/docs/auth/web/start
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../../../firebase/firebaseConfig'
+
+import { FetchIpDetails } from '../../fetchApi';
 
 const LoginScreen = (props) => {
   const [email, setEmail] = useState('')
@@ -35,8 +37,17 @@ const LoginScreen = (props) => {
     }
   },[props.user])
 
+  
+  useEffect(()=>{
+    // FetchIpDetails().then(res=>console.log(JSON.stringify(res)));
+    // FetchIpDetails()
+  },[])
+
+  
+
 
   const handleLogin = (e) => {
+    Keyboard.dismiss();
     e.preventDefault();
     console.log('logging In . . .')
 

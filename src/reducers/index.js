@@ -15,6 +15,20 @@ const reducer = (state = {}, action) => {
         case 'DEL_USER':
             return {...state , user:undefined}
 
+        case 'NEW_EVENT_MODAL':
+            return {...state , openNewEventModal:action.showModal}
+
+        case 'SET_EVENTS':
+            return {...state , events:action.events}
+        
+        case 'SET_BLUETOOTH_DATA':
+            return {...state , bluetoothData:action.bluetoothData}
+        
+
+
+        case 'SET_LOADING':
+            return {...state , loading:action.loading}
+
       default: 
            return state;
     }

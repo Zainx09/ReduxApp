@@ -17,3 +17,16 @@ npm install --save-dev redux-devtools
 
 ////firebase v9
 npm i firebase
+
+////ble-plx
+npm i react-native-ble-plx
+
+///image picker
+npm i react-native-image-picker
+
+npm i lodash
+npm i moment
+
+///export CSV
+npm i react-native-fs
+npm i xlsx --legacy-peer-deps
