@@ -2,10 +2,10 @@ import React, { Component, useEffect, useState } from 'react'
 import { Text, View, PermissionsAndroid, TouchableOpacity } from 'react-native'
 import { connect } from "react-redux";
 
-import { delUser, openEventModal, saveBlData } from '../actions';
-
+import { delUser, openEventModal, saveBlData, updateBluetoothList, setLocationPermission, setBluetoothState} from '../actions';
 import { BleManager } from 'react-native-ble-plx';
-import { Button } from '@ant-design/react-native';
+import UploadBluetoothFloatButton from '../screens/home/components/widgets/UploadBluetoothFloatButton';
+import { connectStorageEmulator } from 'firebase/storage';
 
 
 async function requestLocationPermission() {
@@ -35,21 +35,44 @@ const manager = new BleManager();
 
 const BluetoothScan=(props)=>{
 
-  const [bl , setBl] = useState()
-  const [blData , setBlData] = useState({})
+  const [blData , setBlData] = useState({
+    // '111':{
+    //   'name' : 'device.name',
+    //   'id' : 'device.id',
+    //   'scanDate' : new Date()
+    // }
+  })
 
   useEffect(()=>{
+    if(blData){
+      console.log('update bluetooth')
+      props.updateBluetoothList(blData)
+    }
+  },[blData])
+
+  // useEffect(()=>{
+  //   if(props.bluetoothData){
+  //     set
+  //   }
+  // },[props.bluetoothData])
+
+  useEffect(()=>{
+    console.log('Check Location Permission ------- ')
     const subscription = manager.onStateChange((state) => {
       // console.log(state)
-      if (state === 'PoweredOn') {
+      if (state === 'PoweredOn'){
+        props.setBluetoothState('On')
         const permission = requestLocationPermission();
+        props.setLocationPermission(permission)
         if (permission){
             scanAndConnect();
-        }  
+        }
         subscription.remove();
+      }else{
+        props.setBluetoothState('Off');
       }
     }, true);
-  },[])
+  },[props.askPermission])
 
   //15min = 900000 milisec
 
@@ -73,21 +96,40 @@ const BluetoothScan=(props)=>{
           allowDuplicates: false,
           },
           async (error, device) => {
+
+            manager.onStateChange((state) =>{
+              // console.log(state)
+              if (state === 'PoweredOn'){
+                props.setBluetoothState('On')
+              }else{
+                props.setBluetoothState('Off');
+              }
+            }, true);
             
             if (error) {
               manager.stopDeviceScan();
             }
 
             if(device.id){
-              // console.log(JSON.stringify(blData));
+              // console.log(JSON.stringify("Found-----"+device.id));
+              // console.log("Found-----"+device.id)
+
+              // blData[device.id]={
+              //     'name' : device.name,
+              //     'id' : device.id,
+              //     'ScanDate' : new Date()
+              // }
+
+              // setBlData(blData)
 
               setBlData(prev=>{
                 prev[device.id] = {
                   'name' : device.name,
                   'id' : device.id,
-                  'ScanDate' : new Date()
+                  'scanDate' : new Date()
                 }
-
+                // props.updateBluetoothList(prev)
+                // console.log(JSON.stringify(prev))
                 return(prev)
               })
             }
@@ -102,6 +144,7 @@ const BluetoothScan=(props)=>{
 
   return (
     <View style={{height:0}}>
+      <UploadBluetoothFloatButton />
     </View>
   )
   
@@ -111,13 +154,19 @@ const BluetoothScan=(props)=>{
 const mapStateToProps = (state) =>{
     return {
         user: state.user,
+        bluetoothData : state.bluetoothData,
+        pointsList:state.pointsList,
+        askPermission:state.askPermission
       }
   }
   
   const mapDispatchToProps = {
     delUser,
     openEventModal,
-    saveBlData
+    saveBlData,
+    updateBluetoothList,
+    setLocationPermission,
+    setBluetoothState
   }
 
   

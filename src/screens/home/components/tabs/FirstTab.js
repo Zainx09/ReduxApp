@@ -1,6 +1,6 @@
 /* tslint:disable:no-console */
 import React, { useState, useEffect } from 'react'
-import { ScrollView, Text, TouchableOpacity, View, StyleSheet } from 'react-native'
+import { ScrollView, Text, TouchableOpacity, View, StyleSheet, SafeAreaView } from 'react-native'
 import {
   Provider,
   Button,
@@ -19,6 +19,7 @@ import { delUser, openEventModal } from '../../../../actions';
 import NewEventModal from './../modals/NewEventModal';
 import FloatButton from '../widgets/FloatButton';
 import EventsView from '../events/EventsView';
+
 
 import { Dimensions } from 'react-native';
 
@@ -59,7 +60,7 @@ const FirstTab=(props)=>{
   }
 
   return (
-    <View style={{ flex:1, borderWidth:0 , marginHorizontal:10, marginBottom:1 }}>
+    <View style={{ height:'100%', borderWidth:0 , marginHorizontal:4, paddingBottom:0 , marginBottom:0 }}>
       <Provider>
         {/* <View style={{display:'flex', flexDirection:'row', width:'100%' , borderWidth:0 , justifyContent:'flex-end'}}>
           <Searchbar
@@ -74,7 +75,6 @@ const FirstTab=(props)=>{
         </View> */}
 
         <EventsView />
-
         <FloatButton handleFloatButtonClick={handleFloatButtonClick}/>   
 
       </Provider>

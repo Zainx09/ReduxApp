@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { ScrollView, Text, TouchableOpacity, View, StyleSheet } from 'react-native'
 import {
   Provider,
@@ -15,50 +15,38 @@ import { connect } from "react-redux";
 import { collection, getDocs,doc, setDoc } from 'firebase/firestore/lite';
 import { auth, db } from '../../../../../firebase/firebaseConfig';
 
-import { delUser, openEventModal } from '../../../../actions';
+import { delUser, openEventModal, signOut } from '../../../../actions';
 import NewEventModal from './../modals/NewEventModal';
 import FloatButton from '../widgets/FloatButton';
 
 const ThirdTab=(props)=>{
 
+  const [points , setPoints] = useState()
+
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('userInfo')
-      props.delUser()
+      // props.delUser()
+      props.signOut()
     }catch(e) {
       // console.log(e)
     } 
   }
 
-  const checkDb= async ()=>{
-      try {
-        const citiesCol = collection(db, 'cities');
-        const citySnapshot = await getDocs(citiesCol);
-        const cityList = citySnapshot.docs.map(doc => doc.data());
-        // console.log(cityList);
-
-        } catch (e) {
-          // console.error("Error adding document");
-        }
+  useEffect(()=>{
+    if(props.pointsList){
+      setPoints(props.pointsList[0].pointname)
     }
+  },[props.pointsList])
 
-    const addData=async()=>{
-      await setDoc(doc(db, "cities", "random"), {
-        city_name: "Los Angeles",
-      });
-    }
+  return (
+    <View style={{ height:'100%' , borderWidth:0 , marginHorizontal:10, display:'flex' , alignItems:'center'}}>
+      <TouchableOpacity style={{width:'70%' , height:40 , borderWidth:0, display:'flex' , alignItems:'center' , justifyContent:'center', backgroundColor:'#dc0707'}} onPress={handleLogout}>
+          <Text>Logout</Text>
+      </TouchableOpacity>
 
-    const handleFloatButtonClick=()=>{
-      props.openEventModal(props.openNewEventModal? !props.openNewEventModal :true)
-    }
-
-    return (
-      <View style={{ height:'100%' , borderWidth:0 , marginHorizontal:10, display:'flex' , alignItems:'center'}}>
-        <TouchableOpacity style={{width:'70%' , height:40 , borderWidth:0, display:'flex' , alignItems:'center' , justifyContent:'center', backgroundColor:'#dc0707'}} onPress={handleLogout}>
-           <Text>Logout</Text>
-        </TouchableOpacity>
-      </View>
-    )
+      <Text style={{fontSize:20 , color:'black'}}>POINTS : {points}</Text>
+    </View>
+  )
   
 }
 
@@ -113,13 +101,15 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) =>{
   return {
       user: state.user,
-      openNewEventModal : state.openNewEventModal
+      openNewEventModal : state.openNewEventModal,
+      pointsList:state.pointsList
 
     }
   }
   
   const mapDispatchToProps = {
     delUser,
-    openEventModal
+    openEventModal,
+    signOut
   }
   export default connect(mapStateToProps, mapDispatchToProps)(ThirdTab)

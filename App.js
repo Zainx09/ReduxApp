@@ -6,6 +6,9 @@
  * @flow strict-local
  */
 
+//Disable Yellow Warning Box
+//https://aboutreact.com/disable-react-native-yellow-box-warnings/
+
 import React, { useEffect, useState } from 'react';
 
 import {
@@ -17,69 +20,110 @@ import {
   Text,
   useColorScheme,
   View,
+  LogBox
 } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider, Snackbar } from 'react-native-paper';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from "react-redux";
 import { Toast } from '@ant-design/react-native';
+import NetInfo from "@react-native-community/netinfo";
 
-import { setUser, fetchEvents, fetchPoints } from './src/actions';
+import { signInWithEmailAndPassword , onAuthStateChanged} from "firebase/auth";
+import { auth, db } from './firebase/firebaseConfig'
+import { setUser, fetchEvents, fetchPoints, getUserStatus, signOut, getPointsList } from './src/actions';
 
 import LoginScreen from './src/screens/login';
-import HomeScreen from './src/screens/home';
+import Home from './src/screens/home';
 import Loader from './src/screens/home/components/widgets/loader';
+import NetworkLostView from './src/screens/home/components/widgets/NetworkLostView';
+import SnackbarView from './src/screens/home/components/widgets/SnackbarView';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
+LogBox.ignoreAllLogs();
 
 const App = (props) => {
 
   const [isLogin , setIsLogin] = useState(undefined);
-
-  const storeData = async (value) => {
-    try {
-      const jsonValue = JSON.stringify(value)
-      await AsyncStorage.setItem('userInfo', jsonValue)
-      setIsLogin(true)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('userInfo')
-      if(jsonValue != null){
-        props.setUser(JSON.parse(jsonValue));
-        setIsLogin(true)
-      }else{
-        setIsLogin(false)
-      }
-    }catch(e) {
-      // error reading value
-      console.log(e)
-    }
-  }
+  const [isLoading , setIsLoading] = useState(true);
+  const [networkStatus , setNetworkStatus] = useState(true);
+  const [visible, setVisible] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [isSnackbar , setIsSnackbar] = useState(false)
 
   useEffect(()=>{
-    getData();
-    // props.fetchEvents()
+    if(isSnackbar){
+      setVisible(true);
+    }
+  },[isSnackbar, networkStatus])
+
+  useEffect(()=>{
+    // Subscribe
+    const unsubscribe = NetInfo.addEventListener(state => {
+      console.log("Connection type", state.type);
+      console.log("Is connected?", state.isConnected);
+      if(!state.isConnected){
+        setSnackbarMessage('Internet Connection Lost!')
+        setIsSnackbar(true);
+        setVisible(true);
+      }else{
+        setSnackbarMessage('Internet Connection Restore!')
+      }
+      setNetworkStatus(state.isConnected);
+      
+    });
+
+    // Unsubscribe
+    return(unsubscribe)
   },[])
 
   useEffect(()=>{
-    if(props.user){
-      props.fetchEvents(props.user.uid)
-      props.fetchPoints(props.user.uid)
-      // alert(props.user.uid)
-      storeData(props.user);
-    }else{
-      // setIsLogin(false)
-      getData();
+    if(props.loading === true || props.loading===false){
+      setIsLoading(props.loading)
     }
-  },[props.user])
+  },[props.loading])
+
+  useEffect(()=>{
+    onAuthStateChanged(auth, (user) => {
+      if(user){
+        setIsLogin(true)
+        setIsLoading(false)
+        props.setUser(user)
+        props.getPointsList(user.uid)
+        
+      }else{
+        setIsLogin(false)
+        setIsLoading(false)
+      }
+    })
+  })
+
 
   return (
-    <View style={{flex:1}}>
-      {isLogin===true?<HomeScreen />:isLogin===false?<LoginScreen />:<Loader />}
-    </View>
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex:1, borderWidth:0 , borderColor:'red'}}>
+      {isLoading ? <Loader /> :
+        isLogin?<Provider><Home /></Provider>:<LoginScreen />
+      }
+      <SnackbarView visible={visible} setVisible={setVisible} iconName={networkStatus ? 'wifi' : 'wifi-remove'} backColor={networkStatus ? '#3CB371' : '#CD5C5C'} snackbarMessage={snackbarMessage} />
+      {/* <Snackbar
+        style={{backgroundColor: networkStatus ? '#3CB371' : '#CD5C5C', borderRadius:10, width:'80%' , alignSelf:'center'}}
+        duration={4000}
+        visible={visible}
+        onDismiss={() => setVisible(false)}
+        >
+          <View style={{display:'flex' , flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
+            <MIcon name={networkStatus ? 'wifi' : 'wifi-remove'} size={22} color="white" />
+            <Text style={{color:'white', marginLeft:10 ,fontSize:16, fontWeight:'bold'}}>{snackbarMessage}</Text>
+          </View>
+          
+      </Snackbar> */}
+
+      {/* {!networkStatus && <View style={{position:'absolute', zIndex:1 , height:'100%' , width:'100%' , opacity:0.8}}><NetworkLostView /></View>} */}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 
@@ -87,13 +131,18 @@ const App = (props) => {
 const mapStateToProps = (state) =>{
   return {
       user: state.user,
+      userStatus: state.userStatus,
+      loading : state.loading
     }
 }
 
 const mapDispatchToProps = {
+  getUserStatus,
   setUser,
   fetchEvents,
-  fetchPoints
+  fetchPoints,
+  signOut,
+  getPointsList
 }
 
 // const mapDispatchToProps=(dispatch)=>{

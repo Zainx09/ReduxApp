@@ -12,59 +12,38 @@ import { setUser , loginRequest } from '../../actions';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../../../firebase/firebaseConfig'
 
-import { FetchIpDetails } from '../../fetchApi';
+// import { FetchIpDetails } from '../../fetchApi';
 
 const LoginScreen = (props) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [user , setUser] = useState('abcd')
+  const [email, setEmail] = useState()
+  const [password, setPassword] = useState()
 
-  // const storeData = async (value) => {
-  //   try {
-  //     const jsonValue = JSON.stringify(value)
-  //     await AsyncStorage.setItem('userInfo', jsonValue)
-  //   } catch (e) {
-  //     console.log(e)
-  //   }
-  // }
-
-  useEffect(()=>{
-    // alert(JSON.stringify(props.user))
-    if(props.user){
-      Toast.info('This is a toast tips')
-        setUser(props.user)
-        // alert(JSON.stringify(props.user))
-    }
-  },[props.user])
-
+  const [ geoLocation , setGeoLocation ] = useState()
   
-  useEffect(()=>{
-    // FetchIpDetails().then(res=>console.log(JSON.stringify(res)));
-    // FetchIpDetails()
-  },[])
-
-  
-
-
   const handleLogin = (e) => {
     Keyboard.dismiss();
     e.preventDefault();
     console.log('logging In . . .')
 
     props.loginRequest(email, password)
-
-    // signInWithEmailAndPassword(auth, email, password)
-    // .then((userCredential) => {
-    //     const user = userCredential.user;
-    //     console.log(user.email);
-    //     props.setUser(user)
-    // })
-    // .catch((error) => {
-    //     const errorCode = error.code;
-    //     const errorMessage = error.message;
-    //     console.log(error.message)
-    // });
   }
+
+  function FetchIpDetails() {
+
+    let url = 'http://ipwho.is/';
+
+    fetch(url)
+        .then(res => res.json())
+        .then((data) => {
+        console.log("-------------"+data);
+        setGeoLocation(data)
+    })
+    .catch(err => { throw err });
+  }
+
+  useState(()=>{
+    FetchIpDetails();
+  },[])
 
   return (
     <KeyboardAvoidingView
@@ -90,17 +69,23 @@ const LoginScreen = (props) => {
       <View style={styles.buttonContainer}>
 
         <TouchableOpacity
+          disabled={(email && password)?false:true}
           onPress={handleLogin}
           style={styles.button}
         >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        {/* <Button  title='Login' onPress={handleLogin}></Button> */}
-        {/* <NoticeBar mode="closable" onPress={() => alert('will close')}>
-          delayed during National Day.
-        </NoticeBar> */}
 
       </View>
+
+      <View>
+        <Text style={{fontSize:12 , color:'red' , marginTop:10 , fontStyle:'italic'}}>{props.loginError?props.loginError:null}</Text>
+      </View>
+      {geoLocation && <View style={{display:'flex' , flexDirection:'column', alignItems:'center', marginTop:10}}>
+        <Text style={{fontSize:14 , color:'gray' , fontStyle:'italic'}}>Ip "{geoLocation.ip}"</Text>
+        <Text style={{fontSize:14 , color:'gray' , fontStyle:'italic'}}>Country "{geoLocation.country}"</Text>
+        <Text style={{fontSize:14 , color:'gray' , fontStyle:'italic'}}>Region "{geoLocation.region}"</Text>
+      </View>}
 
       {/* <Text>{JSON.stringify(user.email)}</Text> */}
     </KeyboardAvoidingView>
@@ -133,8 +118,8 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#0782F9',
     width: '100%',
-    padding: 15,
-    borderRadius: 10,
+    padding: 10,
+    borderRadius: 5,
     alignItems: 'center',
   },
   buttonOutline: {
@@ -158,6 +143,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) =>{
     return {
         user: state.user,
+        loginError : state.loginError
       }
 }
 

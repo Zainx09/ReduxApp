@@ -1,35 +1,21 @@
+import React from "react";
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable, connectStorageEmulator } from "firebase/storage";
 import { auth, db, storage } from '../../firebase/firebaseConfig';
+import {NetworkInfo} from 'react-native-network-info';
 
 export async function FetchIpDetails() {
+    let ip = await fetch("https://api.ipgeolocation.io/getip");
 
-    fetch('https://ipapi.co/8.8.8.8/json/')
-        .then(function(response) {
-        response.json().then(jsonData => {
-            console.log(jsonData);
-        });
-        })
-        .catch(function(error) {
-        console.log(error)
-        });
-    
-    // await fetch("https://ipapi.co/8.8.8.8/city/")
-    // .then(response => console.log(response))
+    // let url = 'https://api.ipgeolocation.io/ipgeo?apiKey=716fc4049831441ebb4464462200c721';
 
-    // var url = 'https://freegeoip.net/json/';
-    // fetch(url)
-    //   .then((response) => response.json())
-    //   .then((responseJson) => {
-    //     //console.log(responseJson);
-    //     this.setState({
-    //       countryName: responseJson.country_name,
-    //       regionName: responseJson.region_name
-    //     });
-    //   })
-    //   .catch((error) => {
-    //    //console.error(error);
-    //   });
+    let url = "http://ipwho.is/"
 
+    fetch(url)
+        .then(res => res.json())
+        .then((data) => {
+        console.log("-------------"+JSON.stringify(data));
+    })
+    .catch(err => { throw err });
 }
 
 

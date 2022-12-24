@@ -2,6 +2,7 @@ npm install @react-navigation/native
 npm install @react-navigation/native-stack
 npm install react-native-screens react-native-safe-area-context
 npm i react-native-gesture-handler
+npm i @react-navigation/material-top-tabs
 
 npm install --save react-native-reanimated 
 
@@ -30,3 +31,16 @@ npm i moment
 ///export CSV
 npm i react-native-fs
 npm i xlsx --legacy-peer-deps
+
+
+///Internet info
+npm install --save @react-native-community/netinfo
+
+
+npm i --save @fortawesome/fontawesome-svg-core
+npm i --save @fortawesome/free-solid-svg-icons
+
+npm i --save @fortawesome/free-regular-svg-icons --legacy-peer-deps
+npm i --save @fortawesome/react-fontawesome@latest --legacy-peer-deps
+
+npm i @ui-kitten/components @eva-design/eva react-native-svg --legacy-peer-deps

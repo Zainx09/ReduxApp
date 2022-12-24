@@ -7,14 +7,15 @@ const FloatButton=(props)=>{
         floatButton: {
             width:props.width || 50, 
             height:props.height || 50, 
-            backgroundColor:props.backgroundColor || 'blue', 
+            backgroundColor:props.backgroundColor || '#1E90FF', 
             borderRadius:props.borderRadius || 50, 
             position:'absolute',
-            bottom:70,
-            right:30,
+            bottom:'15%',
+            right:10,
             display:'flex', 
             justifyContent:'center' , 
-            alignItems:'center'
+            alignItems:'center',
+            opacity:0.8
         },
     })
 
@@ -23,7 +24,7 @@ const FloatButton=(props)=>{
             onPress={props.handleFloatButtonClick}
             style={props.style || styles.floatButton}
         >
-            <Text style={{color:'white' , fontSize:22}}>+</Text>
+            <Text style={{color:'white' , fontSize:22, fontWeight:'bold'}}>+</Text>
         </TouchableOpacity> 
     )
   

@@ -3,15 +3,69 @@ import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from "react-redux";
 
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import {Button , Toast, Provider} from '@ant-design/react-native';
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import {Button , Toast, Provider, Drawer} from '@ant-design/react-native';
+import * as eva from '@eva-design/eva';
+import { ApplicationProvider } from '@ui-kitten/components';
 
-import {delUser} from "../../actions"
+import {delUser,fetchEvents, fetchPoints} from "../../actions"
 import TabScreen from './components/TabScreen';
 import NewEventModal from './components/modals/NewEventModal';
 import BluetoothScan from "../../bluetoothComponent/BluetoothScan";
+import CustomStatusBar from './components/widgets/CustomStatusBar';
+import HomeScreen from './components/homeScreen/HomeScreen';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const HomeScreen = (props) => {
+const Home = (props) => {
+
+  const [start , setStart] = useState(true);
+  const [drawerOpen , setDrawerOpen] = useState(false);
+
+  const [selectedTab , setSelectedTab] = useState(0)
+
+  const Sidebar=()=>(
+      <View style={{height:'100%' , width:'100%' , borderWidth:0, display:'flex' , flexDirection:'column' , justifyContent:'center', opacity:0.8}}>
+        
+        <TouchableOpacity style={styles.button} onPress={()=>{ setDrawerOpen(false); setStart(false)}}>
+            <MIcon name="home" size={25} color='#008B8B' />
+            <Text style={styles.buttonText}>Home</Text>
+        </TouchableOpacity>
+
+        <View style={{width:'100%' , borderWidth:0 , borderColor:'black' , marginVertical:8}}/>
+
+        <TouchableOpacity style={styles.button} icon="logout" mode="contained" onPress={()=>{setSelectedTab(0); setDrawerOpen(false)}}>
+          <MIcon name="file-document" size={25} color='#B8860B' />
+          <Text style={styles.buttonText}>Events</Text>
+        </TouchableOpacity>
+
+        <View style={{width:'100%' , borderWidth:0 , borderColor:'black' , marginVertical:8}}/>
+
+        <TouchableOpacity style={styles.button} icon="logout" mode="contained" onPress={()=>{setSelectedTab(1); setDrawerOpen(false)}}>
+          <MIcon name="bluetooth" size={25} color='#B8860B' />
+          <Text style={styles.buttonText}>Points</Text>
+        </TouchableOpacity>
+
+        <View style={{width:'100%' , borderWidth:0 , borderColor:'black' , marginVertical:8}}/>
+
+        <TouchableOpacity style={styles.button} icon="logout" mode="contained" onPress={()=>{setSelectedTab(2); setDrawerOpen(false)}}>
+          <MIcon name="contacts" size={25} color='#B8860B' />
+          <Text style={styles.buttonText}>Contatcs</Text>
+        </TouchableOpacity>
+
+        <View style={{width:'100%' , borderWidth:0.5 , borderColor:'lightgray' , marginVertical:20}}/>
+
+        <TouchableOpacity style={[styles.button , {width:'80%', backgroundColor:'#8B0000', justifyContent:'center', borderRadius:8}]} icon="logout" mode="contained" onPress={handleLogout}>
+          <MIcon name="logout" size={25} color='white' />
+          <Text style={[styles.buttonText , {color:'white'}]}>Logout</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.button , { width:'80%', marginTop:20, justifyContent:'center', borderWidth:0, borderRadius:8}]} icon="logout" mode="contained" onPress={()=>setDrawerOpen(false)}>
+          {/* <MIcon name="logout" size={25} color='white' /> */}
+          <Text style={[styles.buttonText , {color:'gray', fontSize:22}]}>X</Text>
+        </TouchableOpacity>
+      </View>
+    )
   
   handleLogout = async () => {
     try {
@@ -23,13 +77,29 @@ const HomeScreen = (props) => {
   }
 
   return (
-    <View style={{flex:1}}>
-      <Provider>
-        <TabScreen />
-        <NewEventModal />
-        <BluetoothScan />
-      </Provider>
-    </View>
+    <ApplicationProvider {...eva} theme={eva.light}>
+      <View style={{flex:1}}>
+        {!start ? <HomeScreen setStart={setStart}/> :
+
+          <Drawer
+            sidebar={<Sidebar />}
+            position="right"
+            open={drawerOpen}
+            drawerWidth={250}
+            drawerContainerStyle={{height:'60%' , marginTop:'20%'}}
+            // drawerRef={(el: any) => (this.drawer = el)}
+            // onOpenChange={this.onOpenChange}
+            drawerBackgroundColor="white">
+              <Provider>
+                <CustomStatusBar setDrawerOpen={setDrawerOpen}/>
+                <TabScreen selectedTab={selectedTab}/>
+                <NewEventModal />
+                {/* <BluetoothScan /> */}
+              </Provider>
+          </Drawer>
+        }
+      </View>
+    </ApplicationProvider>
   )
 }
 
@@ -40,17 +110,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  button: {
-    backgroundColor: '#0782F9',
-    width: '80%',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
+  button: {width:'100%', height:40, display:'flex' , flexDirection:'row' , alignItems:'center', marginLeft:'10%'},
+
   buttonText: {
-    color: 'white',
+    color: 'black',
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: 18,
+    marginLeft:10
   },
   
 })
@@ -62,7 +128,9 @@ const mapStateToProps = (state) =>{
 }
 
 const mapDispatchToProps = {
-  delUser
+  delUser,
+  fetchEvents,
+  fetchPoints
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
+export default connect(mapStateToProps, mapDispatchToProps)(Home)

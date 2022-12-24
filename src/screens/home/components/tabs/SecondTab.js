@@ -19,9 +19,10 @@ import { auth, db, storage, functions } from '../../../../../firebase/firebaseCo
 import { delUser, openEventModal, saveBlData } from '../../../../actions';
 import NewEventModal from './../modals/NewEventModal';
 import FloatButton from '../widgets/FloatButton';
-
+import BluetoothScan from '../../../../bluetoothComponent/BluetoothScan';
 import ImageUploader from '../widgets/imageUploader/ImageUploader'
 import PointsView from '../points/PointsView';
+
 
 
 const SecondTab=(props)=>{
@@ -62,20 +63,9 @@ const SecondTab=(props)=>{
     // })
   }
   return (
-    <View style={{ height:'100%' , borderWidth:0 , marginHorizontal:10, display:'flex' , alignItems:'center'}}>
-      {/* <TouchableOpacity 
-        style={{width:'70%' , height:40 , borderWidth:0, display:'flex' , alignItems:'center' , justifyContent:'center', backgroundColor:'#dc0707'}} 
-        onPress={checkFunction}>
-          <Text>Check Bluetooth Save</Text>
-      </TouchableOpacity> */}
-
-      {/* <View style={{height:'100%', width:'100%' , borderWidth:1}}>
-        {Object.keys(blData).length>0 && Object.keys(blData).map((objId)=>(
-          <Text style={{width:'100%' ,fontWeight:'bold' , fontSize:20 , borderWidth:1}}>{blData[objId].name}</Text>
-        ))}
-      </View> */}
+    <View style={{ height:'100%', borderWidth:0 , marginHorizontal:4, paddingBottom:0 , marginBottom:0 }}>
       <PointsView />
-
+      <BluetoothScan />
     </View>
   )
   

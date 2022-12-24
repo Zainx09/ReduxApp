@@ -12,6 +12,10 @@ export const loginRequest = (email, password) => ({
     password
 });
 
+export const signOut = () => ({
+    type: 'SIGN_OUT_USER',
+});
+
 export const setUser = (user) => ({
     type: 'SET_USER',
     user
@@ -37,13 +41,38 @@ export const fetchEvents=(uid)=>({
     uid
 })
 
+export const getPointsList = (uid)=>({
+    type:'GET_POINTS_LIST',
+    uid
+})
+
 export const saveBlData = ({uid , data})=>({
     type:'SAVE_BLUETOOTH_LIST',
     uid,
     data
 })
 
+export const updateBluetoothList=(bluetoothData)=>({
+    type:'UPDATE_BLUETOOTH_DATA',
+    bluetoothData
+})
+
 export const fetchPoints=(uid)=>({
     type:"FETCH_POINTS",
     uid
+})
+
+export const setLocationPermission=(isLocationPermission)=>({
+    type:"SET_LOCATION_PERMISSION",
+    isLocationPermission
+})
+
+export const askLocationPermission=(askPermission)=>({
+    type:"ASK_LOCATION_PERMISSION",
+    askPermission
+})
+
+export const setBluetoothState=(bluetoothState)=>({
+    type:"SET_BLUETOOTH_STATE",
+    bluetoothState
 })

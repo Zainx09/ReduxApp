@@ -15,6 +15,8 @@ import ImagePicker , {launchCamera, launchImageLibrary} from 'react-native-image
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { auth, db, storage } from '../../../../../../firebase/firebaseConfig';
 import SelectImageOption from './SelectOption';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 let options = {
   title: 'Select Image',
@@ -121,12 +123,13 @@ export default (props)=>{
     
 
     return (
-        <View style={{borderWidth:0, display:'flex' , flexDirection:'row' , width:'100%'}}>
-            <TouchableOpacity style={{borderWidth:1, borderColor:'gray' ,height:25 , paddingHorizontal:10, paddingTop:2}} onPress={()=>setShowOptionModal(true)}>
-              <Text style={{color:'black'}}>Take Picture</Text>
+        <View style={{borderWidth:0, display:'flex' , flexDirection:'row' , width:'100%', alignItems:'center'}}>
+            <TouchableOpacity style={{display:'flex' , flexDirection:'row', alignItems:'center', borderWidth:0, borderColor:'darkgray' ,height:30 , paddingHorizontal:10, borderRadius:5, backgroundColor:'#3CB371'}} onPress={()=>setShowOptionModal(true)}>
+              <MIcon name="camera" size={15} color='white' />
+              <Text style={{fontSize:12 , color:'white'}}>  Upload!</Text>
             </TouchableOpacity>
             <SelectImageOption selectImage={selectImage} showOptionModal={showOptionModal} setShowOptionModal={setShowOptionModal}/>
-            <Text style={{borderWidth:0 , width:'50%', marginLeft:5, color:'gray'}}>{imageName || 'Not selected!'}</Text>
+            <Text style={{borderWidth:0 , width:'50%', marginLeft:0, color:'gray' , fontSize:12}}>{imageName || 'Not selected!'}</Text>
         </View>
     )
 }

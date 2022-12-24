@@ -1,14 +1,16 @@
 import React, { Component, useEffect, useState } from 'react'
 import { Alert, PermissionsAndroid, Text, TouchableOpacity, View } from 'react-native'
-import { Pagination, WhiteSpace, WingBlank } from '@ant-design/react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 import { Searchbar } from 'react-native-paper';
+import { Input} from '@ui-kitten/components';
 import { connect } from "react-redux";
 import PointItem from './PointItem';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { exportDataToExcel } from '../csvDownloadScript/csv-scripts';
 import { DateTime } from '../widgets/DateTimePicker';
 import Loader from '../widgets/loader';
+import BluetoothTurnOffView from '../../../../bluetoothComponent/BluetoothTurnOffView';
+import TryAgainView from '../widgets/TryAgainView';
 
 
 let headers = [
@@ -25,15 +27,13 @@ let data2 = [
 
 const PointView=(props)=>{
 
-    const [data , setData] = useState([]);
-    const [searchEvent , setSearchEvent] = useState()
+    const [data , setData] = useState({});
+    const [searchPoint , setSearchPoint] = useState()
 
     const [ showDatePicker , setShowDatePicker ] = useState(false);
 
     const [fromDate , setFromDate] = useState(new Date(Date.now() - 864e5))
-    const [toDate , setToDate] = useState(new Date())
-
-    const [listLoading , setListLoading] = useState(false)
+    const [toDate , setToDate] = useState()
 
     const onChangeDateFrom=(event , date)=>{
       setFromDate(date)
@@ -44,17 +44,52 @@ const PointView=(props)=>{
     }
 
 
-    useEffect(()=>{
-      if(props.bluetoothData){
-        // console.log(JSON.stringify(props.events))
-        setData(props.bluetoothData)
-        // console.log(props.events)
-      }
-    },[props.bluetoothData])
+    // useEffect(()=>{
+    //   if(props.bluetoothData){
+    //     // console.log(JSON.stringify(props.bluetoothData))
+    //     setData(props.bluetoothData)
+    //     // console.log(props.events)
+    //   }
+    // },[props.bluetoothData])
 
     useEffect(()=>{
-      setListLoading(props.loading)
-    },[props.loading])
+      setData({})
+      if(props.bluetoothData){
+        // console.log(JSON.stringify(props.bluetoothData))
+        let obj={}
+        Object.keys(props.bluetoothData).forEach((bluetoothId)=>{
+          if(toDate){
+            if(props.bluetoothData[bluetoothId].scanDate >= fromDate && props.bluetoothData[bluetoothId].scanDate <= toDate){
+              
+              if(searchPoint){
+                Object.keys(props.bluetoothData[bluetoothId]).forEach((key)=>{
+                  if( key!=='scanDate' && props.bluetoothData[bluetoothId][key]!=null && props.bluetoothData[bluetoothId][key].toLowerCase().includes(searchPoint.toLowerCase())){
+                    obj[bluetoothId] = props.bluetoothData[bluetoothId]
+                  }
+                })
+              }else{
+                obj[bluetoothId] = props.bluetoothData[bluetoothId]
+              }
+              
+            }
+          }else{
+            if(props.bluetoothData[bluetoothId].scanDate >= fromDate){
+              if(searchPoint){
+                Object.keys(props.bluetoothData[bluetoothId]).forEach((key)=>{
+                  if( key!=='scanDate' && props.bluetoothData[bluetoothId][key]!=null && props.bluetoothData[bluetoothId][key].toLowerCase().includes(searchPoint.toLowerCase())){
+                    obj[bluetoothId] = props.bluetoothData[bluetoothId]
+                  }
+                })
+              }else{
+                obj[bluetoothId] = props.bluetoothData[bluetoothId]
+              }
+            }
+          }
+          
+        })
+        setData(obj)
+      }
+    },[props.bluetoothData , fromDate , toDate, searchPoint])
 
     
     const downloadCSV=async()=>{
@@ -90,60 +125,68 @@ const PointView=(props)=>{
     }
 
     return (
-      <View style={{ flex:1, borderWidth:0}}>
+      <View style={{ flex:1, borderWidth:0, display:'flex' , flexDirection:'column' , alignItems:'center',paddingBottom:'20%'}}>
 
-        <View style={{display:'flex', flexDirection:'row', width:'100%' , borderWidth:0, alignItems:'center', justifyContent:'space-between'}}>
-          <Searchbar
-            style={{ width:'76%', height:45 , marginVertical:5 , borderRadius:8, backgroundColor:'white'}}
-            inputStyle={{fontSize:14}}
-            placeholder="Search Event"
-            icon='text-search'
-            onChangeText={setSearchEvent}
-            value={searchEvent}
-          />
+        <View style={{display:'flex', flexDirection:'row', width:'90%' , borderWidth:0, alignItems:'center', justifyContent:'space-between', marginVertical:5}}>
+          <View style={{width:'78%' , borderWidth:1 , display:'flex' , flexDirection:'row' , alignItems:'center', paddingLeft:12, borderRadius:6, opacity:0.8, borderColor:'lightgray'}}>
+            <View>
+              <Icon name="search" size={18} color='gray'/>
+            </View>
+            
+            <Input
+              size='small'
+              style={{ width:'100%', borderWidth:0,  borderRadius:10, backgroundColor:'white', opacity:0.8}}
+              textStyle={{fontSize:12}}
+              value={searchPoint}
+              placeholder='Search Event'
+              onChangeText={setSearchPoint}
+            />
+          </View>
+
           <TouchableOpacity
-            style={{width:'11%', height:45, borderWidth:showDatePicker?2:1, borderColor:showDatePicker?'lightblue':'lightgray', borderRadius:8, display:'flex' , alignItems:'center' , justifyContent:'center' , backgroundColor:'white'}}
+            style={{width:'10%', height:35, borderWidth:1, borderColor:showDatePicker?'#1E90FF':'lightgray', borderRadius:8, display:'flex' , alignItems:'center' , justifyContent:'center' , backgroundColor:'white', opacity:0.8}}
             onPress={()=>{setShowDatePicker(!showDatePicker)}}>
-            <Icon name="calendar" size={17} color={'gray'}/>
+            <Icon name="calendar" size={17} color={'#1E90FF'}/>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={{width:'11%', height:45, borderWidth:1, borderColor:'lightgray', borderRadius:8, display:'flex' , alignItems:'center' , justifyContent:'center' , backgroundColor:'white'}}
+            style={{width:'10%', height:35, borderWidth:1, borderColor:'lightgray', borderRadius:8, display:'flex' , alignItems:'center' , justifyContent:'center' , backgroundColor:'white', opacity:0.8}}
+            disabled={Object.keys(data).length>0?false:true}
             onPress={()=>{downloadCSV()}}>
-            <Icon name="file-download" size={17} color={'gray'}/>
+            <Icon name="file-download" size={17} color={'#B22222'}/>
           </TouchableOpacity>
         </View>
 
         { showDatePicker && 
-        <View style={{display:'flex' , flexDirection:'row', width:'100%', justifyContent:'space-around', borderWidth:0.5, paddingTop:5 , paddingBottom:8, backgroundColor:'white' , borderRadius:10 , marginTop:0 , marginBottom:8, borderColor:'#D4D4D4'}}>
-          <View style={{display:'flex' , flexDirection:'column'}}>
-            <Text style={{fontSize:16 , marginRight:5 , color:'gray' , fontWeight:'bold'}}>From</Text>
-            <DateTime hideNowButton onChangeDate={(event , value)=>onChangeDateFrom(event , value)} date={fromDate}/>
+        <View style={{width:'95%', display:'flex' , flexDirection:'column', alignItems:'center', borderWidth:1, paddingVertical:5, paddingHorizontal:20, backgroundColor:'white' , borderRadius:12 , marginTop:0 , marginBottom:8, borderColor:'#D4D4D4'}}>
+          <View style={{display:'flex' , flexDirection:'row', alignItems:'center', marginBottom:2}}>
+            <Text style={{fontSize:14,width:50, marginRight:5 , color:'gray' , fontWeight:'bold'}}>From</Text>
+            <DateTime hideNowButton direction='row' onChangeDate={(event , value)=>onChangeDateFrom(event , value)} date={fromDate}/>
           </View>
           
 
-          <View style={{display:'flex' , flexDirection:'column'}}>
-            <Text style={{fontSize:16 , marginRight:5 , color:'gray' , fontWeight:'bold'}}>To</Text>
-            <DateTime hideNowButton onChangeDate={(event , value)=>onChangeDateTo(event , value)} date={toDate}/>
+          <View style={{display:'flex' , flexDirection:'row', alignItems:'center'}}>
+            <Text style={{fontSize:14 ,width:50, marginRight:5 , color:'gray' , fontWeight:'bold'}}>To</Text>
+            <DateTime hideNowButton direction='row' onChangeDate={(event , value)=>onChangeDateTo(event , value)} date={toDate}/>
           </View>
         </View>}
 
-        <ScrollView style={{borderWidth:0.5, borderColor:'lightgray', borderRadius:10, backgroundColor:'white', marginBottom:50}}>
-          {listLoading ? 
-          <Loader /> 
-          :          
-          Object.keys(data).length>0 &&
-            Object.keys(data).map((pointId)=>{
-              if(data[pointId].ScanDate.toDate() >= fromDate && data[pointId].ScanDate.toDate() <= toDate){
+        <ScrollView style={{width:'100%', borderWidth:0.5, borderColor:'lightgray', borderRadius:10, backgroundColor:'white'}}>         
+          {
+            props.bluetoothState !== 'On' ?
+              <BluetoothTurnOffView message2={'Please Turn On Bluetooth!'} iconName="bluetooth-off"/>
+            :
+            !props.isLocationPermission ?
+              <BluetoothTurnOffView message2={'Location Permission Denied!'} iconName="cancel" showReTryBtn/>
+            :
+            Object.keys(data).length>0 ?
+              Object.keys(data).map((pointId)=>{
                 return (<PointItem pointId={pointId} pointData={data[pointId]}/>)
-              }
-            })
+              })
+              :
+              <TryAgainView hideMessage/>
           }
-          
         </ScrollView>
-        {/* <View style={{borderWidth:1}}>
-          <Pagination total={5} current={1} locale={{prevText:'Prev', nextText:'Next'}} />
-        </View> */}
         
       </View>
       )
@@ -155,7 +198,9 @@ const mapStateToProps = (state) =>{
         openNewEventModal : state.openNewEventModal,
         events:state.events,
         loading:state.loading,
-        bluetoothData : state.bluetoothData
+        bluetoothData : state.bluetoothData,
+        isLocationPermission:state.isLocationPermission,
+        bluetoothState:state.bluetoothState
       }
     }
     

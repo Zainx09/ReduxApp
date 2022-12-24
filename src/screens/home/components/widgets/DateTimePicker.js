@@ -5,6 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { TextInput, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const DateTime = (props) => {
     const [date, setDate] = useState(props.date || new Date());
@@ -14,11 +15,14 @@ export const DateTime = (props) => {
     const [showTime, setShowTime] = useState(false);
   
     const onDateChange = (event, selectedDate) => {
-      const currentDate = selectedDate;
-      setShowDate(false);
-      setShowTime(false);
-      setDate(currentDate);
-      props.onChangeDate('dateTime' , currentDate)
+      if(selectedDate){
+        const currentDate = selectedDate;
+        setShowDate(false);
+        setShowTime(false);
+        setDate(currentDate);
+        props.onChangeDate('dateTime' , currentDate)
+      }
+      
     };
 
     // const onTimeChange = (event, selectedTime) => {
@@ -27,15 +31,16 @@ export const DateTime = (props) => {
     //     setTime(currentTime);
     //   };
   
-    const showMode = (currentMode) => {
-    //   if (Platform.OS === 'And') {
-    //     setShow(false);
-    //     // for iOS, add a button that closes the picker
-    //   }
+    // const showMode = (currentMode) => {
+    // //   if (Platform.OS === 'And') {
+    // //     setShow(false);
+    // //     // for iOS, add a button that closes the picker
+    // //   }
     
-    setShow(true)
-      setMode(currentMode);
-    };
+    // setShow(true)
+    //   setMode(currentMode);
+
+    // };
   
     const showDatepicker = () => {
         setShowDate(true);
@@ -47,23 +52,26 @@ export const DateTime = (props) => {
   
     return (
       <View style={{display:'flex' , flexDirection:'row',borderWidth:0}}>
-        <View style={{display:'flex' , flexDirection:'column'}}>
 
-            <TouchableOpacity style={styles.btnStyle} onPress={showDatepicker}>
-                <Text style={{marginRight:15 , fontWeight:'bold' }}>{date.toLocaleDateString()}</Text>
-                <Icon name="angle-down" size={18} color={'gray'}/>
+        <View style={{display:'flex' , flexDirection:props.direction||'column'}}>
+
+            <TouchableOpacity style={[styles.btnStyle , {marginRight:props.direction?15:5}]} onPress={showDatepicker}>
+              <MIcon name="calendar" size={15} color='white' />
+              <Text style={{marginRight:0 , fontWeight:'', fontSize:12, color:'white' }}>  {date? date.toLocaleDateString() : 'Date'}</Text>
+                {/* <Icon name="angle-down" size={14} color={'gray'}/> */}
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.btnStyle} onPress={showTimepicker}>
-                <Text style={{marginRight:15 , fontWeight:'bold'}}>{date.toLocaleTimeString()}</Text>
-                <Icon name="angle-down" size={20} color={'gray'}/>
+            <TouchableOpacity style={[styles.btnStyle , {marginRight:5}]} onPress={showTimepicker}>
+              <MIcon name="camera-timer" size={15} color='white' />
+              <Text style={{marginRight:0 , fontWeight:'', fontSize:12, color:'white'}}>  {date? date.toLocaleTimeString() : 'Time'}</Text>
+                {/* <Icon name="angle-down" size={14} color={'gray'}/> */}
             </TouchableOpacity>
 
         </View>
 
         {!props.hideNowButton && <View style={{display:'flex' , flexDirection:'column', justifyContent:'flex-end', marginLeft:5}}>
-            <TouchableOpacity style={styles.btnStyle} onPress={()=>setDate(new Date())}>
-                <Text>Now</Text>
+            <TouchableOpacity style={[styles.btnStyle , {minWidth:50, backgroundColor:'darkcyan', borderWidth:0}]} onPress={()=>setDate(new Date())}>
+                <Text style={{fontWeight:'bold', fontSize:12, color:'white'}}>Now</Text>
             </TouchableOpacity>
         </View>}
         
@@ -87,15 +95,18 @@ export const DateTime = (props) => {
 
 const styles = StyleSheet.create({
     btnStyle: {
-        paddingHorizontal:15,
-        height:25,
-        borderWidth:1,
-        borderColor:'darkgray',
+        paddingHorizontal:10,
+        minWidth:80,
+        height:30,
+        borderWidth:0,
+        borderRadius:5,
+        borderColor:'gray',
         alignItems:'center',
         justifyContent:'center',
         marginTop:5,
         display:'flex',
         flexDirection:'row',
+        backgroundColor:'darkcyan'
 
     },
 
