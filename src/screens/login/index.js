@@ -1,18 +1,11 @@
 import { useNavigation } from '@react-navigation/core'
 import React, { useEffect, useState } from 'react'
 import { connect } from "react-redux";
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard } from 'react-native'
-import {Button , Toast} from '@ant-design/react-native';
+import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Keyboard, Image, Platform } from 'react-native'
+import { TextInput, Button } from 'react-native-paper';
+import { loginRequest } from '../../actions';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import { setUser , loginRequest } from '../../actions';
-
-//https://firebase.google.com/docs/auth/web/start
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../../firebase/firebaseConfig'
-
-// import { FetchIpDetails } from '../../fetchApi';
+import Loader from '../home/components/widgets/loader';
 
 const LoginScreen = (props) => {
   const [email, setEmail] = useState()
@@ -46,27 +39,49 @@ const LoginScreen = (props) => {
   },[])
 
   return (
+    props.loading ? 
+
+    <Loader /> : 
+
     <KeyboardAvoidingView
       style={styles.container}
-      behavior="padding"
+      // behavior="padding"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.inputContainer}>
+      <View style={styles.innerContainer}>
+        <Image style={{width:80 , height:80, alignSelf:'center', marginBottom:10}} source = {require('../../assets/logoPNG.png')} />
+        <Text style={{fontSize:20 , color:'dodgerblue', fontWeight:'bold'}}>Beacon Scanner</Text>
+        <Text style={{fontSize:13 , color:'dodgerblue', fontWeight:'' , fontStyle:'italic', marginBottom:10}}>This is an app statement</Text>
+        <Text style={{fontSize:20 , color:'black', fontWeight:'bold', marginBottom:10}}>Sign In</Text>
         <TextInput
-          placeholder="Email"
+          label="Email"
+          mode='outlined'
           value={email}
           onChangeText={text => setEmail(text)}
           style={styles.input}
         />
+        {/* <TextInput
+          placeholder="Email"
+          value={email}
+          onChangeText={text => setEmail(text)}
+          style={styles.input}
+        /> */}
+
         <TextInput
-          placeholder="Password"
+          label="Password"
+          mode='outlined'
           value={password}
           onChangeText={text => setPassword(text)}
           style={styles.input}
           secureTextEntry
         />
-      </View>
-
-      <View style={styles.buttonContainer}>
+        {/* <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={text => setPassword(text)}
+          style={styles.input}
+          secureTextEntry
+        /> */}
 
         <TouchableOpacity
           disabled={(email && password)?false:true}
@@ -76,74 +91,67 @@ const LoginScreen = (props) => {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
-      </View>
+        <View>
+          {props.loginError && <Text style={{fontSize:12 , color:'red' , marginTop:3 , fontStyle:'italic'}}>{props.loginError}</Text>}
+        </View>
+        <Text style={{fontSize:14 , color:'black' , fontStyle:'', marginVertical:10}}>Please Login with provided credentials</Text>
+        {geoLocation && <View style={{display:'flex' , flexDirection:'column', alignItems:'center', marginTop:0}}>
+          <Text style={{fontSize:14 , color:'black' , fontStyle:''}}>Your system ip apppears to be <Text style={{fontWeight:'bold' , fontStyle:'italic'}}>{geoLocation.ip}</Text></Text>
+          <Text style={{fontSize:14 , color:'black' , fontStyle:''}}>from <Text style={{fontWeight:'bold' , fontStyle:'italic'}}>{geoLocation.region}, {geoLocation.country}</Text></Text>
+        </View>}
 
-      <View>
-        <Text style={{fontSize:12 , color:'red' , marginTop:10 , fontStyle:'italic'}}>{props.loginError?props.loginError:null}</Text>
       </View>
-      {geoLocation && <View style={{display:'flex' , flexDirection:'column', alignItems:'center', marginTop:10}}>
-        <Text style={{fontSize:14 , color:'gray' , fontStyle:'italic'}}>Ip "{geoLocation.ip}"</Text>
-        <Text style={{fontSize:14 , color:'gray' , fontStyle:'italic'}}>Country "{geoLocation.country}"</Text>
-        <Text style={{fontSize:14 , color:'gray' , fontStyle:'italic'}}>Region "{geoLocation.region}"</Text>
-      </View>}
-
-      {/* <Text>{JSON.stringify(user.email)}</Text> */}
     </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    marginTop:'30%',
+    display:'flex',
+    flexDirection:'column',
     justifyContent: 'center',
     alignItems: 'center',
+    // borderWidth:10,
+    height:'100%'
   },
-  inputContainer: {
-    width: '80%'
+  innerContainer: {
+    height:'100%',
+    // borderWidth:1,
+    width: '80%',
+    justifyContent:'center',
+    alignItems:'center'
   },
   input: {
+    height: 45,
+    width: '100%',
     backgroundColor: 'white',
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    marginBottom: 5,
     borderRadius: 10,
     marginTop: 5,
   },
-  buttonContainer: {
-    width: '60%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 40,
-  },
   button: {
+    height:50,
     backgroundColor: '#0782F9',
     width: '100%',
     padding: 10,
+    marginTop:10,
     borderRadius: 5,
     alignItems: 'center',
-  },
-  buttonOutline: {
-    backgroundColor: 'white',
-    marginTop: 5,
-    borderColor: '#0782F9',
-    borderWidth: 2,
   },
   buttonText: {
     color: 'white',
     fontWeight: '700',
-    fontSize: 16,
-  },
-  buttonOutlineText: {
-    color: '#0782F9',
-    fontWeight: '700',
-    fontSize: 16,
+    fontSize: 18,
   },
 })
 
 const mapStateToProps = (state) =>{
     return {
         user: state.user,
-        loginError : state.loginError
+        loginError : state.loginError,
+        loading : state.loading
+
       }
 }
 

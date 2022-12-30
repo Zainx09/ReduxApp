@@ -80,7 +80,7 @@
 // export default TabScreen;
 
 import React, { useEffect } from 'react';
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { View } from 'react-native'
 import { Tab, TabBar, Layout, TabView} from '@ui-kitten/components';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -98,23 +98,6 @@ export const TabScreen = (props) => {
   },[props.selectedTab])
 
   return (
-    // <TabBar
-    //   style={{backgroundColor:'white' , height:40}}
-    //   indicatorStyle={{height:35, width:'95%', opacity:0.4 , borderWidth:0, marginTop:2, borderRadius:5 , backgroundColor:'orange'}}
-    //   selectedIndex={selectedIndex}
-    //   onSelect={index => setSelectedIndex(index)}>
-    //     <TabView>
-    //       <Tab title='EVENTS'>
-    //         <Layout style={styles.tabContainer}>
-    //           <Text category='h5'>USERS</Text>
-    //         </Layout>
-    //       </Tab>
-    //       <Tab title='BLUETOOTH'></Tab>
-    //       <Tab title='NFC'></Tab>
-
-    //     </TabView>
-      
-    // </TabBar>
     <View style={{flex:1, borderWidth:0 , borderColor:'blue'}}>
     <TabView
       tabBarStyle={{backgroundColor:'white' , height:40}}
@@ -134,14 +117,4 @@ export const TabScreen = (props) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  tabContainer: {
-    flex:1,
-    backgroundColor:'lightgray',
-    borderWidth:2,
-    borderColor:'green'
-  },
-});
-
 export default TabScreen;

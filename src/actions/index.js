@@ -76,3 +76,9 @@ export const setBluetoothState=(bluetoothState)=>({
     type:"SET_BLUETOOTH_STATE",
     bluetoothState
 })
+
+export const setEventsModalLoading=(bool)=>({
+    type:"SET_EVENTS_MODAL_LOADING",
+    bool
+})
+

@@ -39,6 +39,9 @@ const reducer = (state = {}, action) => {
 
         case 'SET_CONTACTS_LOADING':
             return {...state , contactsLloading:action.loading}
+        
+        case 'SET_EVENTS_MODAL_LOADING':
+            return {...state , eventsModalLoading:action.bool}
 
         case 'SET_LOGIN_ERROR':
             return {...state , loginError:action.loginError}

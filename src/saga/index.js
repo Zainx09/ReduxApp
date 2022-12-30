@@ -72,17 +72,19 @@ function* loginRequest(action) {
 function* getPoints(action){
     let uid = action.uid
     try{
-        const res = yield call(() => getDocs(collection(db , `users/${uid}/site/info/points`)))
+        if(uid){
+            const res = yield call(() => getDocs(collection(db , `users/${uid}/site/info/points`)))
 
-        let dataList=[];
-        if(res){
-            res.forEach((doc) => {
-                dataList.push(doc.data())
-                // console.log(JSON.stringify(doc.data()))
-            })
-        }
-        if(dataList.length){
-            yield put({ type: "SET_POINTS_LIST" , points:dataList});
+            let dataList=[];
+            if(res){
+                res.forEach((doc) => {
+                    dataList.push(doc.data())
+                    // console.log(JSON.stringify(doc.data()))
+                })
+            }
+            if(dataList.length){
+                yield put({ type: "SET_POINTS_LIST" , points:dataList});
+            }
         }
 
     }catch(e){
@@ -116,11 +118,14 @@ function* getPoints(action){
 // }
 
 function* signOutUser(action) {
+    yield put({ type: "SET_LOADING" , loading:true});
     yield signOut(auth).then(() => {
         return (put({ type: "SET_USER" , user:undefined}))
       }).catch((error) => {
         return (put({ type: "SET_USER" , user:undefined}))
       });
+
+    yield put({ type: "SET_LOADING" , loading:false});
 }
 
 function* newEventSave(action){
@@ -182,25 +187,27 @@ function* newEventSave(action){
 function* fetchEvents(action){
     // alert(JSON.stringify(action.uid))
     yield put({ type: "SET_EVENTS_LOADING" , loading:true});
-    const {uid} = action
+    const uid = action.uid
     try{
-        const eventRef = collection(db , `users/${uid}/events`);
+        if(uid){
+            const eventRef = collection(db , `users/${uid}/events`);
        
-        // const querySnapshot=undefined;
-        // alert(JSON.stringify(auth))
-        const querySnapshot = yield call(() => getDocs(query(eventRef , orderBy('dateTime', 'desc'))))
+            // const querySnapshot=undefined;
+            // alert(JSON.stringify(auth))
+            const querySnapshot = yield call(() => getDocs(query(eventRef , orderBy('dateTime', 'desc'))))
 
-        let dataList={};
-        if(querySnapshot){
-            querySnapshot.forEach((doc) => {
-                dataList[doc.id] = doc.data()
-            })
-        }
-        
+            let dataList={};
+            if(querySnapshot){
+                querySnapshot.forEach((doc) => {
+                    dataList[doc.id] = doc.data()
+                })
+            }
+            
 
-        if(dataList){
-            // console.log(Object.keys(dataList))
-            yield put({ type: "SET_EVENTS" , events:dataList});
+            if(dataList){
+                // console.log(Object.keys(dataList))
+                yield put({ type: "SET_EVENTS" , events:dataList});
+            }
         }
         yield put({ type: "SET_EVENTS_LOADING" , loading:false});
     }catch(error){

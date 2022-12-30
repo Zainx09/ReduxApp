@@ -1,12 +1,12 @@
 import React, { Component, useEffect, useState } from 'react'
 import { Alert, PermissionsAndroid, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
-import { Searchbar } from 'react-native-paper';
+import { Searchbar, Button } from 'react-native-paper';
 import { Input} from '@ui-kitten/components';
 import { connect } from "react-redux";
 import PointItem from './PointItem';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { exportDataToExcel } from '../csvDownloadScript/csv-scripts';
+import { exportDataToPDF } from '../csvDownloadScript/csv-scripts';
 import { DateTime } from '../widgets/DateTimePicker';
 import Loader from '../widgets/loader';
 import BluetoothTurnOffView from '../../../../bluetoothComponent/BluetoothTurnOffView';
@@ -28,7 +28,7 @@ let data2 = [
 const PointView=(props)=>{
 
     const [data , setData] = useState({});
-    const [searchPoint , setSearchPoint] = useState()
+    const [searchPoint , setSearchPoint] = useState('')
 
     const [ showDatePicker , setShowDatePicker ] = useState(false);
 
@@ -43,19 +43,15 @@ const PointView=(props)=>{
       setToDate(date)
     }
 
+    const setBluetoothList=()=>{
+      
+    }
 
-    // useEffect(()=>{
-    //   if(props.bluetoothData){
-    //     // console.log(JSON.stringify(props.bluetoothData))
-    //     setData(props.bluetoothData)
-    //     // console.log(props.events)
-    //   }
-    // },[props.bluetoothData])
 
     useEffect(()=>{
       setData({})
-      if(props.bluetoothData){
-        // console.log(JSON.stringify(props.bluetoothData))
+      if(props.bluetoothData && Object.keys(props.bluetoothData).length>0){
+        console.log('############'+JSON.stringify(props.bluetoothData))
         let obj={}
         Object.keys(props.bluetoothData).forEach((bluetoothId)=>{
           if(toDate){
@@ -73,7 +69,7 @@ const PointView=(props)=>{
               
             }
           }else{
-            if(props.bluetoothData[bluetoothId].scanDate >= fromDate){
+            if(props.bluetoothData[bluetoothId]?.scanDate >= fromDate){
               if(searchPoint){
                 Object.keys(props.bluetoothData[bluetoothId]).forEach((key)=>{
                   if( key!=='scanDate' && props.bluetoothData[bluetoothId][key]!=null && props.bluetoothData[bluetoothId][key].toLowerCase().includes(searchPoint.toLowerCase())){
@@ -89,7 +85,7 @@ const PointView=(props)=>{
         })
         setData(obj)
       }
-    },[props.bluetoothData , fromDate , toDate, searchPoint])
+    },[props.bluetoothData, fromDate , toDate, searchPoint])
 
     
     const downloadCSV=async()=>{
@@ -111,12 +107,13 @@ const PointView=(props)=>{
 
           if(granted===PermissionsAndroid.RESULTS.GRANTED){
             console.log('Permission Granted')
-            exportDataToExcel(data2 , 'Test2');
+            exportDataToPDF(data2 , 'Test2');
           }else{
             console.log('Permission Denied')
           }
         }else{
-          exportDataToExcel(data2 , 'Test2');
+          console.log('Permitted')
+          exportDataToPDF(data2 , 'Test2');
         }
       }catch(e){
         console.log('Error while checking permission : '+e)
@@ -127,8 +124,8 @@ const PointView=(props)=>{
     return (
       <View style={{ flex:1, borderWidth:0, display:'flex' , flexDirection:'column' , alignItems:'center',paddingBottom:'20%'}}>
 
-        <View style={{display:'flex', flexDirection:'row', width:'90%' , borderWidth:0, alignItems:'center', justifyContent:'space-between', marginVertical:5}}>
-          <View style={{width:'78%' , borderWidth:1 , display:'flex' , flexDirection:'row' , alignItems:'center', paddingLeft:12, borderRadius:6, opacity:0.8, borderColor:'lightgray'}}>
+        <View style={{display:'flex', flexDirection:'row', width:'100%' , borderWidth:0, alignItems:'center', justifyContent:'space-between', marginVertical:5}}>
+          <View style={{width:'74%' , borderWidth:1 , display:'flex' , flexDirection:'row' , alignItems:'center', paddingLeft:12, borderRadius:6, opacity:0.8, borderColor:'lightgray'}}>
             <View>
               <Icon name="search" size={18} color='gray'/>
             </View>
@@ -151,10 +148,12 @@ const PointView=(props)=>{
 
           <TouchableOpacity
             style={{width:'10%', height:35, borderWidth:1, borderColor:'lightgray', borderRadius:8, display:'flex' , alignItems:'center' , justifyContent:'center' , backgroundColor:'white', opacity:0.8}}
-            disabled={Object.keys(data).length>0?false:true}
+            // disabled={Object.keys(data).length>0?false:true}
             onPress={()=>{downloadCSV()}}>
             <Icon name="file-download" size={17} color={'#B22222'}/>
           </TouchableOpacity>
+
+          <Button loading={props.bluetoothState === 'On'} icon={props.bluetoothState !== 'On' && "moon-full"} disable contentStyle={{borderWidth:0, width:40}} labelStyle={{fontSize:8, color:props.bluetoothState === 'On' ? "darkgreen" : 'indianred'}}/>
         </View>
 
         { showDatePicker && 
@@ -171,7 +170,7 @@ const PointView=(props)=>{
           </View>
         </View>}
 
-        <ScrollView style={{width:'100%', borderWidth:0.5, borderColor:'lightgray', borderRadius:10, backgroundColor:'white'}}>         
+        <ScrollView style={{flex:1 , width:'100%', borderWidth:0.5, borderColor:'lightgray', borderRadius:10, backgroundColor:'white', marginBottom:10}}>         
           {
             props.bluetoothState !== 'On' ?
               <BluetoothTurnOffView message2={'Please Turn On Bluetooth!'} iconName="bluetooth-off"/>
@@ -183,9 +182,11 @@ const PointView=(props)=>{
               Object.keys(data).map((pointId)=>{
                 return (<PointItem pointId={pointId} pointData={data[pointId]}/>)
               })
+
               :
-              <TryAgainView hideMessage/>
+              <TryAgainView hideMessage message={'Searching!'} searcingButton/>
           }
+          <View style={{flex:1, height:80 , borderWidth:0}}></View>
         </ScrollView>
         
       </View>

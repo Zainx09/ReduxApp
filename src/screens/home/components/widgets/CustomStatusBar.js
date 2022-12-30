@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text,TouchableOpacity } from 'react-native'
+import { View, Text,TouchableOpacity, Image } from 'react-native'
 import { connect } from 'react-redux'
 
 import { signOut } from '../../../../actions';
@@ -32,8 +32,11 @@ const CustomStatusBar = (props) => {
         )
     }
     return (
-            <View style={{width:'100%' , height:40, backgroundColor:'white', display:'flex', flexDirection:'row' , alignItems:'center' , paddingHorizontal:20}}>
-                <Text style={{width:'95%', fontSize:18 , fontWeight:'bold', color:'gray'}}>App Name</Text>
+            <View style={{width:'100%' , height:50, backgroundColor:'white', display:'flex', flexDirection:'row' , alignItems:'center' , paddingHorizontal:10, borderWidth:0}}>
+                <View style={{marginRight:'3%'}}>
+                    <Image style={{width:35 , height:35, alignSelf:'center'}} source = {require('../../../../assets/logoPNG.png')} />
+                </View>
+                <Text style={{width:'77%', fontSize:15 , color:'#1E90FF', fontWeight:'bold', opacity:0.7}}>BEACON SCANNER</Text>
                 <TouchableOpacity onPress={()=>props.setDrawerOpen(true)}>
                     <MIcon name="menu" size={25} color='gray' />
                 </TouchableOpacity>

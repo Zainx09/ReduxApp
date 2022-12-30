@@ -1,26 +1,26 @@
-  import React, { useEffect, useState } from 'react'
-  import { ScrollView, Text, View, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native'
-  import { TextInput, RadioButton} from 'react-native-paper';
-  import {
+import React, { useEffect, useState } from 'react'
+import { ScrollView, Text, View, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import { TextInput, RadioButton} from 'react-native-paper';
+import {
     Provider,
     Button,
     Modal,
     Toast,
     WhiteSpace,
     WingBlank,
-  } from '@ant-design/react-native'
-  import { Input } from '@ui-kitten/components';
-  import { IndexPath, Layout, Select, SelectItem } from '@ui-kitten/components';
-
-  import { connect } from "react-redux";
-  import { delUser,openEventModal, saveEvent } from '../../../../actions'
-  import { DateTime } from '../widgets/DateTimePicker';
-  import imageUploader from '../widgets/imageUploader/ImageUploader';
+    } from '@ant-design/react-native'
+import { Input } from '@ui-kitten/components';
+import { IndexPath, Layout, Select, SelectItem } from '@ui-kitten/components';
+import { ProgressBar } from 'react-native-paper';
+import { connect } from "react-redux";
+import { delUser,openEventModal, saveEvent, setEventsModalLoading } from '../../../../actions'
+import { DateTime } from '../widgets/DateTimePicker';
+import imageUploader from '../widgets/imageUploader/ImageUploader';
 import { set } from 'react-native-reanimated';
 import ImageUploader from '../widgets/imageUploader/ImageUploader';
-
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { auth, db, storage } from '../../../../../firebase/firebaseConfig';
+import Loader from '../widgets/loader'
 
 
 const EventTypeOptions = [
@@ -62,8 +62,9 @@ const NewEventModal=(props)=>{
     const [nameError , setNameError] = useState(false);
     const [licenseError , setLicenseError] = useState(false);
     const [detailsError , setDetailsError] = useState(false);
-
-    const [eventData, setEventData] = useState({})
+    const [eventData, setEventData] = useState({});
+    const [progressCounter , setProgressCounter] = useState(0)
+    const [isLoading , setIsLoading] = useState(false)
 
     const ErrorMsg=(props)=>{
         return(
@@ -92,8 +93,9 @@ const NewEventModal=(props)=>{
     function UploadImage(e){
         // e.preventDefault()
         const fileName = imageName;
-    
-        const storageRef = ref(storage, 'images/' +fileName);
+        const path = `b/${props.user.uid}/o/`
+        
+        const storageRef = ref(storage, path+fileName);
     
         const bytes = new Uint8Array([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x21]);
         const uploadTask  = uploadBytesResumable(storageRef, bytes)
@@ -101,6 +103,7 @@ const NewEventModal=(props)=>{
         uploadTask.on('state_changed', (snapshot) => {
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log('Upload is ' + progress + '%');
+            setProgressCounter(progress)
             switch (snapshot.state) {
               case 'paused':
                 console.log('Upload is paused');
@@ -131,9 +134,6 @@ const NewEventModal=(props)=>{
                 }
                 setEventData(eventObj)
                 props.saveEvent(eventObj)
-                // Alert.alert(
-                // 'Event Saved!'
-                // );
             });
           }
         )
@@ -151,12 +151,15 @@ const NewEventModal=(props)=>{
         //     setLicenseError(false)
         // }
         if(!eventDetail){
+
             setDetailsError(true)
             return
         }else{
             setDetailsError(false)
         }
 
+        // props.setEventsModalLoading(true);
+        setIsLoading(true)
 
         if(imageName){
             UploadImage();
@@ -175,17 +178,19 @@ const NewEventModal=(props)=>{
             props.saveEvent(eventObj)
             
         }
-        
+
+        // props.setEventsModalLoading(false);
         onClose();
 
 
-        setVisible(false)
-        props.openEventModal(false)
+        // setVisible(false)
+        // props.openEventModal(false)
     }
   
     const onClose = () => {
         setVisible(false)
         props.openEventModal(false)
+        setIsLoading(false);
     }
 
     useEffect(()=>{
@@ -197,6 +202,8 @@ const NewEventModal=(props)=>{
     return (
     // <View style={{position:'absolute' , height:'100%' , width:'100%'}}>
     // <Provider>
+        
+        
         <Modal
             style={{ width:(Dimensions.get('window').width)-50, borderWidth:0.5, borderColor:'gray', borderRadius:15, marginBottom:'0%', backgroundColor:'white', paddingVertical:10, opacity:0.95}}
             title="Title"
@@ -207,6 +214,8 @@ const NewEventModal=(props)=>{
             closable
             >
 
+            {isLoading? <Loader /> : 
+            
             <ScrollView>
                 <View style={{display:'flex', flexDirection:'column', alignItems:'center', borderWidth:0, marginVertical:0 , height:'100%'}}>
                     <View style={{}}>
@@ -261,6 +270,8 @@ const NewEventModal=(props)=>{
                         </View>
                         <View style={{display:'flex', borderWidth:0, width:'70%'}}>
                             <ImageUploader setImageName={setImageName}/>
+                            {/* { (progressCounter==100 || progressCounter==0 ) && <ImageUploader setImageName={setImageName}/>}
+                            { (progressCounter==100 && progressCounter>0 ) && <ProgressBar progress={progressCounter} color={'#3CB371'} />} */}
                         </View>
                     </View>
 
@@ -280,7 +291,7 @@ const NewEventModal=(props)=>{
                             </RadioButton.Group> */}
                         {/* </View> */}
 
-                        <Layout style={{flex:1}} level='1'>
+                        <Layout style={{flex:1, borderRadius:50}} level='1'>
                             <Select
                                 placeholder='Select Event Type'
                                 // selectedIndex={0}
@@ -312,10 +323,10 @@ const NewEventModal=(props)=>{
                                 multiline
                                 /> */}
                             <Input
-                                style={{ borderWidth:1, borderColor:'darkgray'}}
-                                size='large'
+                                style={{ borderWidth:0.5, borderColor:'lightgray'}}
+                                size='medium'
                                 multiline={true}
-                                placeholder='Details'
+                                placeholder='Enter Details'
                                 value={eventDetail}
                                 onChangeText={(value)=>onChangeEventData('eventDetail' , value)}
                             />
@@ -341,7 +352,7 @@ const NewEventModal=(props)=>{
                                 }
                             </RadioButton.Group>
                         </View> */}
-                        <Layout style={{flex:1}} level='1'>
+                        <Layout style={{flex:1, borderRadius:50}} level='1'>
                             <Select
                                 placeholder='Select Event Type'
                                 // selectedIndex={0}
@@ -373,7 +384,7 @@ const NewEventModal=(props)=>{
                         </TouchableOpacity>
                     </View>
                 </View>
-            </ScrollView>
+            </ScrollView>}
         </Modal>
     
     // </View>
@@ -394,7 +405,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) =>{
     return {
         user: state.user,
-        openNewEventModal : state.openNewEventModal
+        openNewEventModal : state.openNewEventModal,
+        eventsModalLoading : state.eventsModalLoading 
   
       }
 }
@@ -402,6 +414,7 @@ const mapStateToProps = (state) =>{
 const mapDispatchToProps = {
     delUser,
     openEventModal,
-    saveEvent
+    saveEvent,
+    setEventsModalLoading
 }
 export default connect(mapStateToProps, mapDispatchToProps)(NewEventModal)

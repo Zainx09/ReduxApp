@@ -19,8 +19,9 @@ npm install --save-dev redux-devtools
 ////firebase v9
 npm i firebase
 
-////ble-plx
+////ble
 npm i react-native-ble-plx
+npm i react-native-ble-manager --legacy-peer-deps
 
 ///image picker
 npm i react-native-image-picker
@@ -30,7 +31,7 @@ npm i moment
 
 ///export CSV
 npm i react-native-fs
-npm i xlsx --legacy-peer-deps
+npm i xlsx --legacy-peer-deps 
 
 
 ///Internet info

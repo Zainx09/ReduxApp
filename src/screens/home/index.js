@@ -2,13 +2,11 @@ import { useNavigation } from '@react-navigation/core'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from "react-redux";
-
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import {Button , Toast, Provider, Drawer} from '@ant-design/react-native';
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider } from '@ui-kitten/components';
-
-import {delUser,fetchEvents, fetchPoints} from "../../actions"
+import {delUser,fetchEvents, fetchPoints, signOut} from "../../actions"
 import TabScreen from './components/TabScreen';
 import NewEventModal from './components/modals/NewEventModal';
 import BluetoothScan from "../../bluetoothComponent/BluetoothScan";
@@ -16,13 +14,22 @@ import CustomStatusBar from './components/widgets/CustomStatusBar';
 import HomeScreen from './components/homeScreen/HomeScreen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Loader from './components/widgets/loader';
 
 const Home = (props) => {
 
-  const [start , setStart] = useState(true);
+  const [start , setStart] = useState(false);
   const [drawerOpen , setDrawerOpen] = useState(false);
 
-  const [selectedTab , setSelectedTab] = useState(0)
+  const [selectedTab , setSelectedTab] = useState(0);
+
+  const handleLogout = async () => {
+    try {
+      props.signOut()
+    }catch(e) {
+      console.log(e)
+    } 
+  }
 
   const Sidebar=()=>(
       <View style={{height:'100%' , width:'100%' , borderWidth:0, display:'flex' , flexDirection:'column' , justifyContent:'center', opacity:0.8}}>
@@ -66,17 +73,10 @@ const Home = (props) => {
         </TouchableOpacity>
       </View>
     )
-  
-  handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem('userInfo')
-      props.delUser()
-    }catch(e) {
-      console.log(e)
-    } 
-  }
 
   return (
+    props.loading ? 
+    <Loader /> :
     <ApplicationProvider {...eva} theme={eva.light}>
       <View style={{flex:1}}>
         {!start ? <HomeScreen setStart={setStart}/> :
@@ -124,13 +124,15 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) =>{
   return {
       user: state.user,
+      loading:state.loading
     }
 }
 
 const mapDispatchToProps = {
   delUser,
   fetchEvents,
-  fetchPoints
+  fetchPoints,
+  signOut
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

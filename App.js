@@ -36,6 +36,7 @@ import { setUser, fetchEvents, fetchPoints, getUserStatus, signOut, getPointsLis
 
 import LoginScreen from './src/screens/login';
 import Home from './src/screens/home';
+import HomeScreen from './src/screens/home/components/homeScreen/HomeScreen';
 import Loader from './src/screens/home/components/widgets/loader';
 import NetworkLostView from './src/screens/home/components/widgets/NetworkLostView';
 import SnackbarView from './src/screens/home/components/widgets/SnackbarView';
@@ -86,18 +87,24 @@ const App = (props) => {
   },[props.loading])
 
   useEffect(()=>{
-    onAuthStateChanged(auth, (user) => {
-      if(user){
-        setIsLogin(true)
-        setIsLoading(false)
-        props.setUser(user)
-        props.getPointsList(user.uid)
-        
-      }else{
-        setIsLogin(false)
-        setIsLoading(false)
-      }
-    })
+    if(props.user){
+      setIsLogin(true)
+      setIsLoading(false)   
+    }
+  },[])
+
+  onAuthStateChanged(auth, (user) => {
+    if(user){
+      props.setUser(user)
+      props.getPointsList(user.uid)
+      setIsLogin(true)
+      setIsLoading(false)       
+      
+    }else{
+      props.setUser(null)
+      setIsLogin(false)
+      setIsLoading(false)
+    }
   })
 
 
@@ -144,14 +151,4 @@ const mapDispatchToProps = {
   signOut,
   getPointsList
 }
-
-// const mapDispatchToProps=(dispatch)=>{
-//   return{
-//     setUser:(user)=>{
-//       dispatch(setUser(user))
-//     },
-  
-//     }
-// }
-
 export default connect(mapStateToProps,mapDispatchToProps)(App);

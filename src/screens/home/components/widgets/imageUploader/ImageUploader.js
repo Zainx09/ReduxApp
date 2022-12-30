@@ -124,12 +124,12 @@ export default (props)=>{
 
     return (
         <View style={{borderWidth:0, display:'flex' , flexDirection:'row' , width:'100%', alignItems:'center'}}>
-            <TouchableOpacity style={{display:'flex' , flexDirection:'row', alignItems:'center', borderWidth:0, borderColor:'darkgray' ,height:30 , paddingHorizontal:10, borderRadius:5, backgroundColor:'#3CB371'}} onPress={()=>setShowOptionModal(true)}>
+            <TouchableOpacity style={{display:'flex' , flexDirection:'row', alignItems:'center', borderWidth:0, borderColor:'darkgray' ,height:35 , paddingHorizontal:10, borderRadius:5, backgroundColor:'#3CB371'}} onPress={()=>setShowOptionModal(true)}>
               <MIcon name="camera" size={15} color='white' />
               <Text style={{fontSize:12 , color:'white'}}>  Upload!</Text>
             </TouchableOpacity>
             <SelectImageOption selectImage={selectImage} showOptionModal={showOptionModal} setShowOptionModal={setShowOptionModal}/>
-            <Text style={{borderWidth:0 , width:'50%', marginLeft:0, color:'gray' , fontSize:12}}>{imageName || 'Not selected!'}</Text>
+            <Text style={{borderWidth:0 , width:'50%', marginLeft:0, color:'gray' , fontSize:11, marginLeft:5}}>{imageName || 'Not selected!'}</Text>
         </View>
     )
 }

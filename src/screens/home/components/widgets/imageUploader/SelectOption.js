@@ -35,7 +35,7 @@ const SelectImageOption = (props) => {
               <Text style={styles.textStyle}>Open Camera</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button , {backgroundColor:'#dc0707', borderBottomEndRadius:15, borderBottomStartRadius:15}]}
+              style={[styles.button , {backgroundColor:'firebrick', borderBottomEndRadius:15, borderBottomStartRadius:15}]}
               onPress={() => props.setShowOptionModal(false)}
             >
               <Text style={[styles.textStyle , {color:'white'}]}>Cancel</Text>
@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    // backgroundColor:'whitesmoke',
     // marginTop: 22
   },
   modalView: {
@@ -59,11 +60,11 @@ const styles = StyleSheet.create({
     // margin: 20,
     backgroundColor: "white",
     borderRadius: 15,
-    borderWidth:2,
+    borderWidth:0,
     borderColor:'darkgray',
     paddingTop: 0,
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: "black",
     shadowOffset: {
       width: 0,
       height: 2
@@ -71,14 +72,15 @@ const styles = StyleSheet.create({
     // shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    backgroundColor:'lightgray'
+    backgroundColor:'whitesmoke',
+    opacity:1
   },
   button: {
     display:'flex',
     alignItems:'center',
     justifyContent:'center',
     width:'100%',
-    height:45,
+    height:50,
     borderRadius: 0,
     borderTopWidth:1,
     borderColor:'darkgray'
