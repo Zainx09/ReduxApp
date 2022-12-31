@@ -19,12 +19,66 @@ const ThirdTab=(props)=>{
   const [points , setPoints] = useState();
 
 
-  const checkFunction = ()=>{
-    const func = httpsCallable(functions, 'log_loc');
-    func().then((result) => {
-        // Read result of the Cloud Function.
-        /** @type {any} */
-        console.log('Funciton Response -----> :'+ result)
+  const checkFunction = async()=>{
+    // const func = httpsCallable(functions, 'log_loc');
+    // func().then((result) => {
+    //     // Read result of the Cloud Function.
+    //     /** @type {any} */
+    //     console.log('Funciton Response -----> :'+ result)
+    //   })
+
+      //alert("Logging")
+      auth.currentUser.getIdToken().then(function (token) {
+        // console.log(token);
+
+        var options = {  
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer " + token,
+          },
+          data: {loc:'reg-country-org'}
+        }
+
+        fetch('https://australia-southeast1-react-native-logs.cloudfunctions.net/log_loc', options)  
+          .then(res => console.log("-------------"+JSON.stringify(res))).catch((e)=>console.log('Error --- : ' + e))
+            // .then((data) => {
+            //   console.log("-------------"+JSON.stringify(data));
+            //   })
+            //   .catch(err => { throw err });
+
+      //   fetch('https://australia-southeast1-react-native-logs.cloudfunctions.net/log_loc', { 
+      //     method: 'GET', 
+      //     headers: new Headers({
+      //         'Authorization': "Bearer " + token, 
+      //     }), 
+      //     body: 'A=1&B=2'
+      // });
+          // jQuery.ajax({
+          //     url: window.location.origin + '/log-loc',
+
+          //     type: 'GET',
+          //     data: { loc: getTableLocalStorage('loc') },
+          //     beforeSend: function (xhr) {
+          //         xhr.setRequestHeader("Authorization", "Bearer " + token);
+          //     },
+          //     success: function (response) {
+
+          //         // response
+          //         //alert('wait')
+          //         //console.log('Res=>' + response);
+          //         setTableLocalStorage('deviceInfo', JSON.stringify(response));
+          //         //roleCheck();
+          //         window.location = "\logs.html"
+          //     },
+          //     error: function (response) {
+          //         console.log('Error Res=>' + JSON.stringify(response)); 
+          //         window.location = "logs.html"
+          //     }
+          // })
+
+
       })
   }
 
