@@ -15,26 +15,50 @@ import HomeScreen from './components/homeScreen/HomeScreen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Loader from './components/widgets/loader';
+import { PropsService } from '@ui-kitten/components/devsupport';
 
 const Home = (props) => {
-
-  const [start , setStart] = useState(false);
   const [drawerOpen , setDrawerOpen] = useState(false);
 
   const [selectedTab , setSelectedTab] = useState(0);
+  const [userInfo , setUserInfo] = useState()
 
   const handleLogout = async () => {
     try {
+      setDrawerOpen(false);
+      await AsyncStorage.removeItem('userInfo')
       props.signOut()
     }catch(e) {
-      console.log(e)
+      console.log("Error -----"+e)
     } 
   }
 
+  const handleHomeClick = async()=>{
+
+    try {
+      setUserInfo()
+      setDrawerOpen(false);
+      await AsyncStorage.removeItem('userInfo')
+    } catch(e) {
+      console.log("Error -----"+e)
+    }
+  }
+
+  useEffect(()=>{
+    if(props.userInfo){
+      setUserInfo(props.userInfo)
+    }
+  },[])
+
   const Sidebar=()=>(
       <View style={{height:'100%' , width:'100%' , borderWidth:0, display:'flex' , flexDirection:'column' , justifyContent:'center', opacity:0.8}}>
-        
-        <TouchableOpacity style={styles.button} onPress={()=>{ setDrawerOpen(false); setStart(false)}}>
+        {userInfo && 
+          <View style={{borderBottomWidth:0.5, borderColor:'lightgray', paddingLeft:20, marginBottom:5, paddingBottom:5}}>
+            <Text style={{fontSize:16 , color:'black' , fontStyle:'italic', fontWeight:'bold'}}>{userInfo.name.toUpperCase()}</Text>
+            <Text style={{fontSize:14 , color:'black' , fontStyle:'italic'}}>{props.user.email}</Text>
+          </View>
+        }
+        <TouchableOpacity style={styles.button} onPress={handleHomeClick}>
             <MIcon name="home" size={25} color='#008B8B' />
             <Text style={styles.buttonText}>Home</Text>
         </TouchableOpacity>
@@ -79,14 +103,14 @@ const Home = (props) => {
     <Loader /> :
     <ApplicationProvider {...eva} theme={eva.light}>
       <View style={{flex:1}}>
-        {!start ? <HomeScreen setStart={setStart}/> :
+        {(!userInfo) ? <HomeScreen setUserInfo={setUserInfo}/> :
 
           <Drawer
             sidebar={<Sidebar />}
             position="right"
             open={drawerOpen}
             drawerWidth={250}
-            drawerContainerStyle={{height:'60%' , marginTop:'20%'}}
+            drawerContainerStyle={{height:'65%' , marginTop:'20%'}}
             // drawerRef={(el: any) => (this.drawer = el)}
             // onOpenChange={this.onOpenChange}
             drawerBackgroundColor="white">

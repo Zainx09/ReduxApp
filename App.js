@@ -53,6 +53,18 @@ const App = (props) => {
   const [visible, setVisible] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [isSnackbar , setIsSnackbar] = useState(false)
+  const [userInfo , setUserInfo] = useState();
+
+  const getUserInfo=async()=>{
+    try {
+      const jsonValue = await AsyncStorage.getItem('userInfo')
+      if(jsonValue != null){
+        setUserInfo(JSON.parse(jsonValue));
+      }
+    } catch(e) {
+      console.log("Error ----- "+e)
+    }
+  }
 
   useEffect(()=>{
     if(isSnackbar){
@@ -87,11 +99,12 @@ const App = (props) => {
   },[props.loading])
 
   useEffect(()=>{
+    getUserInfo();
     if(props.user){
       setIsLogin(true)
       setIsLoading(false)   
     }
-  },[])
+  },[props.user])
 
   onAuthStateChanged(auth, (user) => {
     if(user){
@@ -112,7 +125,7 @@ const App = (props) => {
     <SafeAreaProvider>
       <SafeAreaView style={{ flex:1, borderWidth:0 , borderColor:'red'}}>
       {isLoading ? <Loader /> :
-        isLogin?<Provider><Home /></Provider>:<LoginScreen />
+        isLogin?<Provider><Home userInfo={userInfo}/></Provider>:<LoginScreen />
       }
       <SnackbarView visible={visible} setVisible={setVisible} iconName={networkStatus ? 'wifi' : 'wifi-remove'} backColor={networkStatus ? '#3CB371' : '#CD5C5C'} snackbarMessage={snackbarMessage} />
       {/* <Snackbar

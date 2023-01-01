@@ -5,7 +5,7 @@ import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Keyboar
 import { TextInput, Button } from 'react-native-paper';
 import { loginRequest } from '../../actions';
 
-import Loader from '../home/components/widgets/loader';
+import LoginLoader from '../home/components/widgets/LoginLoader';
 
 const LoginScreen = (props) => {
   const [email, setEmail] = useState()
@@ -39,15 +39,16 @@ const LoginScreen = (props) => {
   },[])
 
   return (
-    props.loading ? 
+    // !props.loading ?  
 
-    <Loader /> : 
+    // <LoginLoader /> : 
 
     <KeyboardAvoidingView
       style={styles.container}
       // behavior="padding"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+      {props.loading && <LoginLoader />}
       <View style={styles.innerContainer}>
         <Image style={{width:80 , height:80, alignSelf:'center', marginBottom:10}} source = {require('../../assets/logoPNG.png')} />
         <Text style={{fontSize:20 , color:'dodgerblue', fontWeight:'bold'}}>Beacon Scanner</Text>

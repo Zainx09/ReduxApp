@@ -13,13 +13,16 @@ const HomeScreen=(props)=>{
   const [nameError , setNameError] = useState(false);
   const [licenseError , setLicenseError] = useState(false);
 
+  const [isLoading , setIsLoading] = useState(false)
+
   const ErrorMsg=(prop)=>{
     return(
         <Text style={{fontSize:11, fontStyle:'italic', color:'red', opacity:0.8}}>{prop.msg}</Text>
     )
   } 
 
-  const onStart=()=>{
+  const onStart=async ()=>{
+    setIsLoading(true);
     if(!name){
         setNameError(true)
     }else{
@@ -33,9 +36,19 @@ const HomeScreen=(props)=>{
 
     if(!name || !license){
       return
+    }else{
+
+      try {
+        await AsyncStorage.setItem('userInfo', JSON.stringify({name , license}) )
+        props.setUserInfo(JSON.stringify({name , license}))
+        // props.setStart(true)
+      } catch (e) {
+        console.log('Error ---- '+e)
+      }
     }
     
-    props.setStart(true)
+    setIsLoading(false);
+    
   }
   
   return (
@@ -80,7 +93,10 @@ const HomeScreen=(props)=>{
           <DateTime hideNowButton direction='row' date={null}/>
         </View>
 
-        <Button style={{borderRadius:8, marginTop:20, width:'50%', backgroundColor:'#0782F9', opacity:1, height:50, justifyContent:'center'}} mode="contained" onPress={onStart}>
+        <Button 
+          style={{borderRadius:8, marginTop:20, width:'50%', backgroundColor:'#0782F9', opacity:1, height:50, justifyContent:'center'}} mode="contained" onPress={onStart}
+          loading={isLoading}
+          disabled={isLoading}>
           Start
         </Button>
       </View>
