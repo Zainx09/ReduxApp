@@ -54,6 +54,8 @@ const App = (props) => {
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [isSnackbar , setIsSnackbar] = useState(false)
   const [userInfo , setUserInfo] = useState();
+  const [ geoLocation , setGeoLocation ] = useState();
+  const [deviceInfo , setDeviceInfo] = useState();
 
   const getUserInfo=async()=>{
     try {
@@ -65,6 +67,58 @@ const App = (props) => {
       console.log("Error ----- "+e)
     }
   }
+
+  
+  // async function FetchDeviceDetails(){
+  //   let region;
+  //   let country;
+  //   let org;
+  //   try {
+  //     if(!geoLocation){
+  //       const jsonValue = await AsyncStorage.getItem('geoLocation')
+  //       if(jsonValue != null){
+  //         console.log("GeoLocation -------------"+jsonValue);
+  //         setGeoLocation(JSON.parse(jsonValue));
+  //       }
+  //     }else{
+  //       console.log("GeoLocation -------------"+geoLocation);
+  //     }
+
+  //     auth.currentUser.getIdToken().then(function (token){
+  //       var options = {  
+  //         method: 'GET',
+  //         headers: {
+  //           'Accept': 'application/json',
+  //           'Content-Type': 'application/json',
+  //           'Authorization': "Bearer " + token,
+  //         },
+  //       }
+  //       //https://australia-southeast1-react-native-logs.cloudfunctions.net/log_loc
+  //       //https://react-native-logs.web.app/log-loc
+  
+  //       let url = 'https://react-native-logs.web.app/log-loc?loc=reg-country-org'
+  
+  //       fetch(url, options)
+  //       .then(res =>res.json())
+  //         .then((res) => {
+  //           console.log("Res -------------"+JSON.stringify(res));
+  //         setDeviceInfo(JSON.stringify(res))
+  //       })
+  //       .catch(err => console.log('Error ---- '+err));
+  
+  //     })
+      
+  //   } catch(e) {
+  //     console.log("Error ----- "+e)
+  //   }
+
+    
+  // }
+
+  // useState(()=>{
+  //   FetchDeviceDetails();
+    
+  // },[geoLocation])
 
   useEffect(()=>{
     if(isSnackbar){
@@ -106,6 +160,7 @@ const App = (props) => {
     }
   },[props.user])
 
+
   onAuthStateChanged(auth, (user) => {
     if(user){
       props.setUser(user)
@@ -125,7 +180,7 @@ const App = (props) => {
     <SafeAreaProvider>
       <SafeAreaView style={{ flex:1, borderWidth:0 , borderColor:'red'}}>
       {isLoading ? <Loader /> :
-        isLogin?<Provider><Home userInfo={userInfo}/></Provider>:<LoginScreen />
+        isLogin?<Provider><Home deviceInfo={deviceInfo} userInfo={userInfo}/></Provider>:<LoginScreen setGeoLocation={setGeoLocation}/>
       }
       <SnackbarView visible={visible} setVisible={setVisible} iconName={networkStatus ? 'wifi' : 'wifi-remove'} backColor={networkStatus ? '#3CB371' : '#CD5C5C'} snackbarMessage={snackbarMessage} />
       {/* <Snackbar

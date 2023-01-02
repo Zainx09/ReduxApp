@@ -28,7 +28,7 @@ const ThirdTab=(props)=>{
     //   })
 
       //alert("Logging")
-      auth.currentUser.getIdToken().then(function (token) {
+      auth.currentUser.getIdToken().then(function (token){
         // console.log(token);
 
         var options = {  
@@ -38,48 +38,23 @@ const ThirdTab=(props)=>{
             'Content-Type': 'application/json',
             'Authorization': "Bearer " + token,
           },
-          data: {loc:'reg-country-org'}
         }
+        //https://australia-southeast1-react-native-logs.cloudfunctions.net/log_loc
+        //https://react-native-logs.web.app/log-loc
 
-        fetch('https://australia-southeast1-react-native-logs.cloudfunctions.net/log_loc', options)  
-          .then(res => console.log("-------------"+JSON.stringify(res))).catch((e)=>console.log('Error --- : ' + e))
-            // .then((data) => {
-            //   console.log("-------------"+JSON.stringify(data));
-            //   })
-            //   .catch(err => { throw err });
+        let url = 'https://react-native-logs.web.app/log-loc?loc=reg-country-org'
 
-      //   fetch('https://australia-southeast1-react-native-logs.cloudfunctions.net/log_loc', { 
-      //     method: 'GET', 
-      //     headers: new Headers({
-      //         'Authorization': "Bearer " + token, 
-      //     }), 
-      //     body: 'A=1&B=2'
-      // });
-          // jQuery.ajax({
-          //     url: window.location.origin + '/log-loc',
-
-          //     type: 'GET',
-          //     data: { loc: getTableLocalStorage('loc') },
-          //     beforeSend: function (xhr) {
-          //         xhr.setRequestHeader("Authorization", "Bearer " + token);
-          //     },
-          //     success: function (response) {
-
-          //         // response
-          //         //alert('wait')
-          //         //console.log('Res=>' + response);
-          //         setTableLocalStorage('deviceInfo', JSON.stringify(response));
-          //         //roleCheck();
-          //         window.location = "\logs.html"
-          //     },
-          //     error: function (response) {
-          //         console.log('Error Res=>' + JSON.stringify(response)); 
-          //         window.location = "logs.html"
-          //     }
-          // })
+        fetch(url, options)
+        .then(res =>res.json())
+          .then((res) => {
+          console.log("Res -------------"+JSON.stringify(res));
+        })
+        .catch(err => console.log('Error ---- '+err));
 
 
-      })
+        
+
+    })
   }
 
   useEffect(()=>{

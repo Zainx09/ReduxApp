@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/core'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth } from '../../../firebase/firebaseConfig';
 import { connect } from "react-redux";
 import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import {Button , Toast, Provider, Drawer} from '@ant-design/react-native';
@@ -19,9 +20,53 @@ import { PropsService } from '@ui-kitten/components/devsupport';
 
 const Home = (props) => {
   const [drawerOpen , setDrawerOpen] = useState(false);
-
   const [selectedTab , setSelectedTab] = useState(0);
   const [userInfo , setUserInfo] = useState()
+  const [deviceInfo , setDeviceInfo] = useState('')
+
+  async function FetchDeviceDetails(){
+    let region;
+    let country;
+    let org;
+    try {
+      const jsonValue = await AsyncStorage.getItem('geoLocation')
+      if(jsonValue != null){
+        let obj = JSON.parse(jsonValue)
+        region = obj.region?obj.region:'null'
+        country = obj.country_code?obj.country_code:'null'
+        org = obj.connection?.org? obj.connection.org:'null'
+
+        auth.currentUser.getIdToken().then(function (token){
+          var options = {  
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': "Bearer " + token,
+            },
+          }
+          //https://australia-southeast1-react-native-logs.cloudfunctions.net/log_loc
+          //https://react-native-logs.web.app/log-loc
+    
+          let url = 'https://react-native-logs.web.app/log-loc?loc='+region+'-'+country+'-'+org
+    
+          fetch(url, options)
+          .then(res =>res.json())
+            .then((res) => {
+              console.log("Res -------------"+JSON.stringify(res));
+              setDeviceInfo(res);
+          })
+          .catch(err => console.log('Error ---- '+err));
+    
+        })
+    }
+      
+    } catch(e) {
+      console.log("Error ----- "+e)
+    }
+
+    
+  }
 
   const handleLogout = async () => {
     try {
@@ -45,6 +90,7 @@ const Home = (props) => {
   }
 
   useEffect(()=>{
+    FetchDeviceDetails();
     if(props.userInfo){
       setUserInfo(props.userInfo)
     }
@@ -54,7 +100,7 @@ const Home = (props) => {
       <View style={{height:'100%' , width:'100%' , borderWidth:0, display:'flex' , flexDirection:'column' , justifyContent:'center', opacity:0.8}}>
         {userInfo && 
           <View style={{borderBottomWidth:0.5, borderColor:'lightgray', paddingLeft:20, marginBottom:5, paddingBottom:5}}>
-            <Text style={{fontSize:16 , color:'black' , fontStyle:'italic', fontWeight:'bold'}}>{userInfo.name.toUpperCase()}</Text>
+            <Text style={{fontSize:16 , color:'black' , fontStyle:'italic', fontWeight:'bold'}}>{userInfo.name?.toUpperCase()}</Text>
             <Text style={{fontSize:14 , color:'black' , fontStyle:'italic'}}>{props.user.email}</Text>
           </View>
         }
@@ -117,7 +163,7 @@ const Home = (props) => {
               <Provider>
                 <CustomStatusBar setDrawerOpen={setDrawerOpen}/>
                 <TabScreen selectedTab={selectedTab}/>
-                <NewEventModal />
+                <NewEventModal deviceInfo={deviceInfo}/>
                 {/* <BluetoothScan /> */}
               </Provider>
           </Drawer>

@@ -219,7 +219,8 @@ const NewEventModal=(props)=>{
             <ScrollView>
                 <View style={{display:'flex', flexDirection:'column', alignItems:'center', borderWidth:0, marginVertical:0 , height:'100%'}}>
                     <View style={{}}>
-                        <Text style={{ textAlign: 'center' , fontSize:12 }}>Your IP 1.1.1.1 ON Android From NSW, AU</Text>
+                        {/* <Text style={{ textAlign: 'center' , fontSize:12 }}>Your IP 1.1.1.1 ON Android From NSW, AU</Text> */}
+                        <Text style={{ textAlign: 'center' , fontSize:12 }}>Your IP {props.deviceInfo?.ip?props.deviceInfo.ip:'None'} ON Android From {props.deviceInfo?.region +', '+props.deviceInfo?.country}</Text>
                     </View>
 
                     <View style={{display:'flex', flexDirection:'row', marginTop:20 , borderWidth:0 , width:'90%', alignItems:'center'}}>

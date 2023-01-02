@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Keyboard, Image, Platform } from 'react-native'
 import { TextInput, Button } from 'react-native-paper';
 import { loginRequest } from '../../actions';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginLoader from '../home/components/widgets/LoginLoader';
 
 const LoginScreen = (props) => {
@@ -28,13 +28,22 @@ const LoginScreen = (props) => {
     fetch(url)
         .then(res => res.json())
         .then((data) => {
-        console.log("-------------"+data);
-        setGeoLocation(data)
+          try {
+            props.setGeoLocation(JSON.stringify(data))
+            setGeoLocation(JSON.stringify(data))
+            AsyncStorage.setItem('geoLocation', JSON.stringify(data) )
+            // console.log("-------------"+data);
+            
+            
+          } catch (e) {
+            console.log('Error ---- '+e)
+          }
     })
-    .catch(err => { throw err });
+    .catch(err => console.log('Error ---- '+err));
   }
 
-  useState(()=>{
+
+  useEffect(()=>{
     FetchIpDetails();
   },[])
 
@@ -61,12 +70,6 @@ const LoginScreen = (props) => {
           onChangeText={text => setEmail(text)}
           style={styles.input}
         />
-        {/* <TextInput
-          placeholder="Email"
-          value={email}
-          onChangeText={text => setEmail(text)}
-          style={styles.input}
-        /> */}
 
         <TextInput
           label="Password"
@@ -76,13 +79,6 @@ const LoginScreen = (props) => {
           style={styles.input}
           secureTextEntry
         />
-        {/* <TextInput
-          placeholder="Password"
-          value={password}
-          onChangeText={text => setPassword(text)}
-          style={styles.input}
-          secureTextEntry
-        /> */}
 
         <TouchableOpacity
           disabled={(email && password)?false:true}
@@ -159,14 +155,5 @@ const mapStateToProps = (state) =>{
 const mapDispatchToProps = {
   loginRequest
 }
-
-// const mapDispatchToProps=(dispatch)=>{
-//     return{
-//       setUser:(user)=>{
-//         dispatch(setUser(user))
-//       },
-    
-//       }
-// }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen)

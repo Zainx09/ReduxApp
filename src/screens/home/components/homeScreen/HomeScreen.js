@@ -22,7 +22,6 @@ const HomeScreen=(props)=>{
   } 
 
   const onStart=async ()=>{
-    setIsLoading(true);
     if(!name){
         setNameError(true)
     }else{
@@ -37,7 +36,7 @@ const HomeScreen=(props)=>{
     if(!name || !license){
       return
     }else{
-
+      setIsLoading(true);
       try {
         await AsyncStorage.setItem('userInfo', JSON.stringify({name , license}) )
         props.setUserInfo(JSON.stringify({name , license}))
