@@ -32,7 +32,7 @@ import NetInfo from "@react-native-community/netinfo";
 
 import { signInWithEmailAndPassword , onAuthStateChanged} from "firebase/auth";
 import { auth, db } from './firebase/firebaseConfig'
-import { setUser, fetchEvents, fetchPoints, getUserStatus, signOut, getPointsList } from './src/actions';
+import { setUser, fetchEvents, fetchPoints, getUserStatus, signOut, getPointsList, setUserInfo, setDeviceInfo } from './src/actions';
 
 import LoginScreen from './src/screens/login';
 import Home from './src/screens/home';
@@ -53,7 +53,7 @@ const App = (props) => {
   const [visible, setVisible] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [isSnackbar , setIsSnackbar] = useState(false)
-  const [userInfo , setUserInfo] = useState();
+  // const [userInfo , setUserInfo] = useState();
   const [ geoLocation , setGeoLocation ] = useState();
   const [deviceInfo , setDeviceInfo] = useState();
 
@@ -61,7 +61,8 @@ const App = (props) => {
     try {
       const jsonValue = await AsyncStorage.getItem('userInfo')
       if(jsonValue != null){
-        setUserInfo(JSON.parse(jsonValue));
+        props.setUserInfo(JSON.parse(jsonValue))
+        // setUserInfo(JSON.parse(jsonValue));
       }
     } catch(e) {
       console.log("Error ----- "+e)
@@ -119,6 +120,13 @@ const App = (props) => {
   //   FetchDeviceDetails();
     
   // },[geoLocation])
+
+  // useEffect(()=>{
+  //   if(props.userInfo){
+
+  //   }
+  //   setUserInfo()
+  // },[props.userInfo])
 
   useEffect(()=>{
     if(isSnackbar){
@@ -180,7 +188,7 @@ const App = (props) => {
     <SafeAreaProvider>
       <SafeAreaView style={{ flex:1, borderWidth:0 , borderColor:'red'}}>
       {isLoading ? <Loader /> :
-        isLogin?<Provider><Home deviceInfo={deviceInfo} userInfo={userInfo}/></Provider>:<LoginScreen setGeoLocation={setGeoLocation}/>
+        isLogin?<Provider><Home userInfo={props.userInfo}/></Provider>:<LoginScreen setGeoLocation={setGeoLocation}/>
       }
       <SnackbarView visible={visible} setVisible={setVisible} iconName={networkStatus ? 'wifi' : 'wifi-remove'} backColor={networkStatus ? '#3CB371' : '#CD5C5C'} snackbarMessage={snackbarMessage} />
       {/* <Snackbar
@@ -207,7 +215,8 @@ const mapStateToProps = (state) =>{
   return {
       user: state.user,
       userStatus: state.userStatus,
-      loading : state.loading
+      loading : state.loading,
+      userInfo : state.userInfo
     }
 }
 
@@ -217,6 +226,8 @@ const mapDispatchToProps = {
   fetchEvents,
   fetchPoints,
   signOut,
-  getPointsList
+  getPointsList,
+  setUserInfo,
+  setDeviceInfo
 }
 export default connect(mapStateToProps,mapDispatchToProps)(App);

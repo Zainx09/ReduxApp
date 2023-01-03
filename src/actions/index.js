@@ -82,3 +82,13 @@ export const setEventsModalLoading=(bool)=>({
     bool
 })
 
+export const setUserInfo=(info)=>({
+    type:"SET_USER_INFO",
+    info
+})
+
+export const setDeviceInfo=(info)=>({
+    type:"SET_DEVICE_INFO",
+    info
+})
+

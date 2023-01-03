@@ -54,6 +54,12 @@ const reducer = (state = {}, action) => {
 
         case 'SET_BLUETOOTH_STATE':
             return {...state , bluetoothState:action.bluetoothState}
+
+        case "SET_USER_INFO":
+            return {...state , userInfo:action.info}
+
+        case "SET_DEVICE_INFO":
+            return {...state , deviceInfo:action.info}
     
       default: 
            return state;

@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Input } from '@ui-kitten/components';
 import { TextInput, Button } from 'react-native-paper';
 import { DateTime } from '../widgets/DateTimePicker';
+import { setUserInfo } from '../../../../actions';
 
 const HomeScreen=(props)=>{
   const [name, setName] = useState(null);
@@ -38,8 +39,9 @@ const HomeScreen=(props)=>{
     }else{
       setIsLoading(true);
       try {
-        await AsyncStorage.setItem('userInfo', JSON.stringify({name , license}) )
-        props.setUserInfo(JSON.stringify({name , license}))
+        props.setUserInfo({name , license})
+        await AsyncStorage.setItem('userInfo', JSON.stringify({name , license}))
+        // props.setUserInfo(JSON.stringify({name , license}))
         // props.setStart(true)
       } catch (e) {
         console.log('Error ---- '+e)
@@ -93,12 +95,18 @@ const HomeScreen=(props)=>{
         </View>
 
         <Button 
-          style={{borderRadius:8, marginTop:20, width:'50%', backgroundColor:'#0782F9', opacity:1, height:50, justifyContent:'center'}} mode="contained" onPress={onStart}
+          style={{borderRadius:8, marginTop:10, width:'50%', backgroundColor:'#0782F9', opacity:1, height:50, justifyContent:'center'}} mode="contained" onPress={onStart}
           loading={isLoading}
           disabled={isLoading}>
           Start
         </Button>
+
+        {props.deviceInfo && <View style={{display:'flex' , flexDirection:'column', alignItems:'center', marginTop:10, borderWidth:0}}>
+          <Text style={{fontSize:14 , color:'black' , fontStyle:''}}>Your system ip apppears to be <Text style={{fontWeight:'bold' , fontStyle:'italic'}}>{props.deviceInfo.ip}</Text></Text>
+          <Text style={{fontSize:14 , color:'black' , fontStyle:''}}>from <Text style={{fontWeight:'bold' , fontStyle:'italic'}}>{props.deviceInfo.region}, {props.deviceInfo.country}</Text></Text>
+        </View>}
       </View>
+      
     </KeyboardAvoidingView>
   )
 }
@@ -131,11 +139,11 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = (state) => ({
-  
+  deviceInfo:state.deviceInfo
 })
 
 const mapDispatchToProps = {
-  
+  setUserInfo
 }
 
 export default connect(mapStateToProps , mapDispatchToProps)(HomeScreen);

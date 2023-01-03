@@ -7,7 +7,7 @@ import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, Touchabl
 import {Button , Toast, Provider, Drawer} from '@ant-design/react-native';
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider } from '@ui-kitten/components';
-import {delUser,fetchEvents, fetchPoints, signOut} from "../../actions"
+import {delUser,fetchEvents, fetchPoints, signOut, setUserInfo, setDeviceInfo} from "../../actions"
 import TabScreen from './components/TabScreen';
 import NewEventModal from './components/modals/NewEventModal';
 import BluetoothScan from "../../bluetoothComponent/BluetoothScan";
@@ -24,17 +24,27 @@ const Home = (props) => {
   const [userInfo , setUserInfo] = useState()
   const [deviceInfo , setDeviceInfo] = useState('')
 
-  async function FetchDeviceDetails(){
+  const getDeviceInfo=async()=>{
+    try {
+      const jsonValue = await AsyncStorage.getItem('geoLocation')
+      if(jsonValue != null){
+        console.log("GEO ------ " + jsonValue)
+        let obj = JSON.parse(jsonValue)
+        FetchDeviceDetails({region:obj.region , country:obj.country_code , org:obj.connection.org});
+      }
+    } catch(e) {
+      console.log("Error -------- "+e)
+    }
+  }
+
+  async function FetchDeviceDetails(obj){
     let region;
     let country;
     let org;
     try {
-      const jsonValue = await AsyncStorage.getItem('geoLocation')
-      if(jsonValue != null){
-        let obj = JSON.parse(jsonValue)
         region = obj.region?obj.region:'null'
-        country = obj.country_code?obj.country_code:'null'
-        org = obj.connection?.org? obj.connection.org:'null'
+        country = obj.country?obj.country:'null'
+        org = obj.org? obj.org:'null'
 
         auth.currentUser.getIdToken().then(function (token){
           var options = {  
@@ -54,25 +64,27 @@ const Home = (props) => {
           .then(res =>res.json())
             .then((res) => {
               console.log("Res -------------"+JSON.stringify(res));
-              setDeviceInfo(res);
+              // setDeviceInfo(res);
+              props.setDeviceInfo(res)
           })
           .catch(err => console.log('Error ---- '+err));
     
         })
-    }
+    // }
       
     } catch(e) {
       console.log("Error ----- "+e)
     }
-
-    
   }
 
   const handleLogout = async () => {
     try {
+      props.setDeviceInfo()
+      props.setUserInfo()
       setDrawerOpen(false);
-      await AsyncStorage.removeItem('userInfo')
+      // await AsyncStorage.removeItem('userInfo')
       props.signOut()
+      await AsyncStorage.clear()
     }catch(e) {
       console.log("Error -----"+e)
     } 
@@ -81,7 +93,8 @@ const Home = (props) => {
   const handleHomeClick = async()=>{
 
     try {
-      setUserInfo()
+      // setUserInfo()
+      props.setUserInfo()
       setDrawerOpen(false);
       await AsyncStorage.removeItem('userInfo')
     } catch(e) {
@@ -90,18 +103,28 @@ const Home = (props) => {
   }
 
   useEffect(()=>{
-    FetchDeviceDetails();
-    if(props.userInfo){
-      setUserInfo(props.userInfo)
-    }
+    getDeviceInfo()
   },[])
+
+  useEffect(()=>{
+    // console.log('GEO --- '+props.deviceInfo)
+    if(props.deviceInfo){
+      // FetchDeviceDetails();
+    }
+  },[props.deviceInfo])
 
   const Sidebar=()=>(
       <View style={{height:'100%' , width:'100%' , borderWidth:0, display:'flex' , flexDirection:'column' , justifyContent:'center', opacity:0.8}}>
-        {userInfo && 
-          <View style={{borderBottomWidth:0.5, borderColor:'lightgray', paddingLeft:20, marginBottom:5, paddingBottom:5}}>
-            <Text style={{fontSize:16 , color:'black' , fontStyle:'italic', fontWeight:'bold'}}>{userInfo.name?.toUpperCase()}</Text>
-            <Text style={{fontSize:14 , color:'black' , fontStyle:'italic'}}>{props.user.email}</Text>
+        {props.userInfo && 
+          // <View style={{borderBottomWidth:1, borderColor:'lightgray', paddingLeft:12, marginBottom:10, marginHorizontal:5, paddingVertical:5, backgroundColor:'lightgray', borderRadius:10}}>
+          <View style={{borderBottomWidth:1, borderColor:'lightgray', paddingLeft:12, marginBottom:10, marginHorizontal:5, paddingVertical:10}}>
+            <Text style={{fontSize:16 , color:'black' , fontStyle:'', fontWeight:'bold'}}>{props.userInfo.name?.toUpperCase()}</Text>
+            <Text style={{fontSize:14 , color:'black' , fontStyle:'italic', fontWeight:'450'}}>{props.user.email}</Text>
+
+            {props.deviceInfo && <View style={{display:'flex' , flexDirection:'column', marginTop:5, borderWidth:0}}>
+              <Text style={{fontSize:14 , color:'black' , fontStyle:''}}>IP <Text style={{fontWeight:'bold' , fontStyle:'italic'}}>{props.deviceInfo.ip}</Text> from <Text style={{fontWeight:'bold' , fontStyle:'italic'}}>{props.deviceInfo.region}, {props.deviceInfo.country}</Text></Text>
+              {/* <Text style={{fontSize:14 , color:'black' , fontStyle:''}}>from <Text style={{fontWeight:'bold' , fontStyle:'italic'}}>{props.deviceInfo.region}, {props.deviceInfo.country}</Text></Text> */}
+            </View>}
           </View>
         }
         <TouchableOpacity style={styles.button} onPress={handleHomeClick}>
@@ -130,7 +153,7 @@ const Home = (props) => {
           <Text style={styles.buttonText}>Contatcs</Text>
         </TouchableOpacity>
 
-        <View style={{width:'100%' , borderWidth:0.5 , borderColor:'lightgray' , marginVertical:20}}/>
+        <View style={{width:'100%' , borderWidth:1 , borderColor:'lightgray' , marginVertical:20}}/>
 
         <TouchableOpacity style={[styles.button , {width:'80%', backgroundColor:'#8B0000', justifyContent:'center', borderRadius:8}]} icon="logout" mode="contained" onPress={handleLogout}>
           <MIcon name="logout" size={25} color='white' />
@@ -149,21 +172,21 @@ const Home = (props) => {
     <Loader /> :
     <ApplicationProvider {...eva} theme={eva.light}>
       <View style={{flex:1}}>
-        {(!userInfo) ? <HomeScreen setUserInfo={setUserInfo}/> :
+        {(!props.userInfo) ? <HomeScreen/> :
 
           <Drawer
             sidebar={<Sidebar />}
             position="right"
             open={drawerOpen}
-            drawerWidth={250}
-            drawerContainerStyle={{height:'65%' , marginTop:'20%'}}
+            drawerWidth={260}
+            drawerContainerStyle={{height:'70%' , marginTop:'20%'}}
             // drawerRef={(el: any) => (this.drawer = el)}
             // onOpenChange={this.onOpenChange}
             drawerBackgroundColor="white">
               <Provider>
                 <CustomStatusBar setDrawerOpen={setDrawerOpen}/>
                 <TabScreen selectedTab={selectedTab}/>
-                <NewEventModal deviceInfo={deviceInfo}/>
+                <NewEventModal/>
                 {/* <BluetoothScan /> */}
               </Provider>
           </Drawer>
@@ -194,7 +217,9 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) =>{
   return {
       user: state.user,
-      loading:state.loading
+      loading:state.loading,
+      deviceInfo:state.deviceInfo
+
     }
 }
 
@@ -202,7 +227,9 @@ const mapDispatchToProps = {
   delUser,
   fetchEvents,
   fetchPoints,
-  signOut
+  signOut,
+  setUserInfo,
+  setDeviceInfo
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

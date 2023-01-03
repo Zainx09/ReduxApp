@@ -29,12 +29,10 @@ const LoginScreen = (props) => {
         .then(res => res.json())
         .then((data) => {
           try {
-            props.setGeoLocation(JSON.stringify(data))
-            setGeoLocation(JSON.stringify(data))
-            AsyncStorage.setItem('geoLocation', JSON.stringify(data) )
-            // console.log("-------------"+data);
-            
-            
+            const jsonValue = JSON.stringify(data)
+            AsyncStorage.setItem('geoLocation', jsonValue)
+            props.setGeoLocation(data)
+            setGeoLocation(data)
           } catch (e) {
             console.log('Error ---- '+e)
           }
