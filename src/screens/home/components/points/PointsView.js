@@ -172,7 +172,7 @@ const PointView=(props)=>{
 
         <ScrollView style={{flex:1 , width:'100%', borderWidth:0.5, borderColor:'lightgray', borderRadius:10, backgroundColor:'white', marginBottom:10}}>         
           {
-            props.bluetoothState !== 'On' ?
+            (props.bluetoothState !== 'On' && !Object.keys(data).length>0) ?
               <BluetoothTurnOffView message2={'Please Turn On Bluetooth!'} iconName="bluetooth-off"/>
             :
             !props.isLocationPermission ?

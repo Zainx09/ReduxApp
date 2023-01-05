@@ -42,7 +42,27 @@ const manager = new BleManager();
 
 const BluetoothScan=(props)=>{
 
-  const [blData , setBlData] = useState([]);
+  const [blData , setBlData] = useState({});
+  const myStateRef = React.useRef(blData);
+
+  const [blState , setBlState] = useState();
+  const blStateRef = React.useRef(blState);
+
+  const setMyState = (id , data) => {
+      props.updateBluetoothList(null)
+      myStateRef.current[id]=data;
+      // console.log(JSON.stringify(myStateRef.current))
+      // props.updateBluetoothList(myStateRef.current)
+      setBlData(prev=>{
+        prev[id]=data
+        return prev
+      })
+  };
+
+  const setBlStateRef = () => {
+    blStateRef.current=props.bluetoothState;
+    setBlState(props.bluetoothState);
+  };
 
   const showToastWithGravity = (msg) => {
     ToastAndroid.showWithGravity(
@@ -54,95 +74,98 @@ const BluetoothScan=(props)=>{
 
   const scanAndConnect=()=>{
 
-    // manager.startDeviceScan(null,null,
-    //     async (error, device) => {
+    manager.startDeviceScan(null,null,
+        async (error, device) => {
           
-    //       if (error) {
-    //         console.log('Error Scanning')
-    //         manager.stopDeviceScan();
-    //       }
+          if (error) {
+            console.log('Error Scanning')
+            manager.stopDeviceScan();
+          }
 
-    //       if(device.id && !blData[device.id]){
-    //         setBlData(prev=>[...prev , device])
-    //         setBlData((prev)=>{
-    //           prev[device.id] = {
-    //             'name' : device.name,
-    //             'id' : device.id,
-    //             'scanDate' : new Date()
-    //           }
-    //           // props.updateBluetoothList(prev)
-    //           return(prev)
-    //         })
-    //       }
-    //     }, 
-    // );
+          if(blStateRef.current !== 'On'){
+            console.log('Off')
+            // manager.stopDeviceScan();
+          }else{
+            if(device.id && !myStateRef.current[device.id]){
+              console.log(device.id)
+              setMyState(device.id , {'id' : device.id , 'name' : device.name , 'scanDate' : new Date()}) 
+            }
+          }
+
+          // if(device.id && !myStateRef.current[device.id]){
+          //   console.log(device.id)
+          //   setMyState(device.id , {'id' : device.id , 'name' : device.name , 'scanDate' : new Date()}) 
+          // }
+        }, 
+    );
 
   }
-
-  // useEffect(()=>{
-  //   BleManager2.start({showAlert: false})
-  //       .then(() => {
-  //         // Success code 
-  //         console.log('Module initialized');
-  //         });
-
-  //     bleManagerEmitter.addListener('BleManagerDiscoverPeripheral',(data) => {
-  //     let device = 'device found: ' + data.name + '(' + data.id + ')'; 
-  //     console.log('DEVICE : '+device)
-
-  //   })
-  // },[])
-
-  BleManager2.start({showAlert: false})
-    .then(() => {
-      // Success code 
-      console.log('Module initialized');
-      });
-
-  bleManagerEmitter.addListener('BleManagerDiscoverPeripheral',(data) => {
-    let device = 'device found: ' + data.name + '(' + data.id + ')'; 
-    console.log('DEVICE : '+device)
-  })
 
 
   useEffect(()=>{
     console.log('Check Location Permission ------- ')
-    const subscription = manager.onStateChange((state) => {
-      // console.log(state)
+    manager.onStateChange((state) =>{
       if (state === 'PoweredOn'){
         props.setBluetoothState('On')
         const permission = requestLocationPermission();
         props.setLocationPermission(permission)
         if (permission){
-            // console.log('--------Granted------- ')
-            // scanAndConnect();
             console.log('start scanning');
-              // BleManager2.scan([], 10, true)
-            
+            scanAndConnect(); 
         }
-        // subscription.remove();
       }else{
         props.setBluetoothState('Off');
       }
     }, true);
-  },[props.askPermission])
+
+  },[])
+
+  
 
   useEffect(()=>{
-    // alert(JSON.stringify(blData))
-  },[blData])
+    setBlStateRef()
+  },[props.bluetoothState])
 
-  // useEffect(() => {
-  //   const interval2 = setInterval(() => {
-  //     // props.updateBluetoothList(null)
-  //     showToastWithGravity("Update")
-  //     // if(Object.keys(blData).length>0){
-  //       props.updateBluetoothList(blData)
-  //     // }
+  useEffect(() => {
+    const interval2 = setInterval(() => {
+      // props.updateBluetoothList(null)
+      // showToastWithGravity("Update")
+      // if(Object.keys(blData).length>0){
+        // props.updateBluetoothList(blData)
+      // }
       
-  //   },20000);
+      props.updateBluetoothList(null)
+      setBlData({})
+      myStateRef.current={};
+
+    },60000);
   
-  //   return () => clearInterval(interval2); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-  // }, [blData])
+    return () => clearInterval(interval2); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  }, [])
+
+
+  useEffect(() => {
+    const interval2 = setInterval(() => {
+      // props.updateBluetoothList(null)
+      // showToastWithGravity("Update")
+      // if(Object.keys(blData).length>0){
+        // props.updateBluetoothList(blData)
+      // }
+      
+      // props.updateBluetoothList(null)
+      // setBlData({})
+      // myStateRef.current={};
+
+      if(blStateRef.current === 'On'){
+        props.updateBluetoothList(null)
+        props.updateBluetoothList(myStateRef.current) 
+      }
+      // props.updateBluetoothList(null)
+      // props.updateBluetoothList(myStateRef.current) 
+    },10000);
+  
+    return () => clearInterval(interval2); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  })
 
   //15min = 900000 milisec
 
@@ -175,23 +198,23 @@ const BluetoothScan=(props)=>{
 
 
 const mapStateToProps = (state) =>{
-    return {
-        user: state.user,
-        bluetoothData : state.bluetoothData,
-        pointsList:state.pointsList,
-        askPermission:state.askPermission,
-        bluetoothState:state.bluetoothState
-      }
+  return {
+    user: state.user,
+    bluetoothData : state.bluetoothData,
+    pointsList:state.pointsList,
+    askPermission:state.askPermission,
+    bluetoothState:state.bluetoothState
   }
+}
   
-  const mapDispatchToProps = {
-    delUser,
-    openEventModal,
-    saveBlData,
-    updateBluetoothList,
-    setLocationPermission,
-    setBluetoothState
-  }
+const mapDispatchToProps = {
+  delUser,
+  openEventModal,
+  saveBlData,
+  updateBluetoothList,
+  setLocationPermission,
+  setBluetoothState
+}
 
   
 

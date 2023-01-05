@@ -114,10 +114,10 @@ const Home = (props) => {
   },[props.deviceInfo])
 
   const Sidebar=()=>(
-      <View style={{height:'100%' , width:'100%' , borderWidth:0, display:'flex' , flexDirection:'column' , justifyContent:'center', opacity:0.8}}>
+      <View style={{height:'100%' , width:'100%' , borderWidth:0, display:'flex' , flexDirection:'column', opacity:0.8, paddingVertical:10}}>
         {props.userInfo && 
           // <View style={{borderBottomWidth:1, borderColor:'lightgray', paddingLeft:12, marginBottom:10, marginHorizontal:5, paddingVertical:5, backgroundColor:'lightgray', borderRadius:10}}>
-          <View style={{borderBottomWidth:1, borderColor:'lightgray', paddingLeft:12, marginBottom:10, marginHorizontal:5, paddingVertical:10}}>
+          <View style={{display:'flex',flexDirection:'column', borderBottomWidth:1, borderColor:'lightgray', paddingLeft:12, marginBottom:15, marginHorizontal:5, paddingVertical:15}}>
             <Text style={{fontSize:16 , color:'black' , fontStyle:'', fontWeight:'bold'}}>{props.userInfo.name?.toUpperCase()}</Text>
             <Text style={{fontSize:14 , color:'black' , fontStyle:'italic', fontWeight:'450'}}>{props.user.email}</Text>
 
@@ -128,41 +128,43 @@ const Home = (props) => {
           </View>
         }
         <TouchableOpacity style={styles.button} onPress={handleHomeClick}>
-            <MIcon name="home" size={25} color='#008B8B' />
+            <MIcon name="home" size={20} color='#008B8B' />
             <Text style={styles.buttonText}>Home</Text>
         </TouchableOpacity>
 
         <View style={{width:'100%' , borderWidth:0 , borderColor:'black' , marginVertical:8}}/>
 
         <TouchableOpacity style={styles.button} icon="logout" mode="contained" onPress={()=>{setSelectedTab(0); setDrawerOpen(false)}}>
-          <MIcon name="file-document" size={25} color='#B8860B' />
+          <MIcon name="file-document" size={20} color='#B8860B' />
           <Text style={styles.buttonText}>Events</Text>
         </TouchableOpacity>
 
         <View style={{width:'100%' , borderWidth:0 , borderColor:'black' , marginVertical:8}}/>
 
         <TouchableOpacity style={styles.button} icon="logout" mode="contained" onPress={()=>{setSelectedTab(1); setDrawerOpen(false)}}>
-          <MIcon name="bluetooth" size={25} color='#B8860B' />
+          <MIcon name="bluetooth" size={20} color='#B8860B' />
           <Text style={styles.buttonText}>Points</Text>
         </TouchableOpacity>
 
         <View style={{width:'100%' , borderWidth:0 , borderColor:'black' , marginVertical:8}}/>
 
         <TouchableOpacity style={styles.button} icon="logout" mode="contained" onPress={()=>{setSelectedTab(2); setDrawerOpen(false)}}>
-          <MIcon name="contacts" size={25} color='#B8860B' />
+          <MIcon name="contacts" size={20} color='#B8860B' />
           <Text style={styles.buttonText}>Contatcs</Text>
         </TouchableOpacity>
 
-        <View style={{width:'100%' , borderWidth:1 , borderColor:'lightgray' , marginVertical:20}}/>
+        <View style={{width:'100%' , borderWidth:1 , borderColor:'lightgray' , marginVertical:25}}/>
 
-        <TouchableOpacity style={[styles.button , {width:'80%', backgroundColor:'#8B0000', justifyContent:'center', borderRadius:8}]} icon="logout" mode="contained" onPress={handleLogout}>
-          <MIcon name="logout" size={25} color='white' />
+        <TouchableOpacity style={[styles.button , {width:'80%', height:50, backgroundColor:'#8B0000', justifyContent:'center', borderRadius:8}]} icon="logout" mode="contained" onPress={handleLogout}>
+          <MIcon name="logout" size={20} color='white' />
           <Text style={[styles.buttonText , {color:'white'}]}>Logout</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button , { width:'80%', marginTop:20, justifyContent:'center', borderWidth:0, borderRadius:8}]} icon="logout" mode="contained" onPress={()=>setDrawerOpen(false)}>
+        <View style={{flex:1 , borderWidth:0 , borderColor:'lightgray'}}/>
+
+        <TouchableOpacity style={[styles.button , { width:'80%', height:80, marginTop:20, justifyContent:'center', borderWidth:0, borderRadius:8}]} icon="logout" mode="contained" onPress={()=>setDrawerOpen(false)}>
           {/* <MIcon name="logout" size={25} color='white' /> */}
-          <Text style={[styles.buttonText , {color:'gray', fontSize:22}]}>X</Text>
+          <Text style={[styles.buttonText , {color:'gray', fontSize:20}]}>X</Text>
         </TouchableOpacity>
       </View>
     )
@@ -178,8 +180,8 @@ const Home = (props) => {
             sidebar={<Sidebar />}
             position="right"
             open={drawerOpen}
-            drawerWidth={260}
-            drawerContainerStyle={{height:'70%' , marginTop:'20%'}}
+            // drawerWidth={300}
+            drawerContainerStyle={{height:'100%'}}
             // drawerRef={(el: any) => (this.drawer = el)}
             // onOpenChange={this.onOpenChange}
             drawerBackgroundColor="white">
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'black',
     fontWeight: '700',
-    fontSize: 18,
+    fontSize: 16,
     marginLeft:10
   },
   
