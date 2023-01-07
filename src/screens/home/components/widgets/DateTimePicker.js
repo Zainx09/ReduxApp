@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { ScrollView, Text, TouchableOpacity, View, StyleSheet } from 'react-native'
 import { DatePicker, List, Provider} from '@ant-design/react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -13,6 +13,11 @@ export const DateTime = (props) => {
     
     const [showDate, setShowDate] = useState(false);
     const [showTime, setShowTime] = useState(false);
+
+    useEffect(()=>{
+      // alert(props.date)
+      setDate(props.date || new Date())
+    },[props.date])
   
     const onDateChange = (event, selectedDate) => {
       if(selectedDate){
@@ -55,7 +60,7 @@ export const DateTime = (props) => {
 
         <View style={{display:'flex' , flexDirection:props.direction||'column'}}>
 
-            <TouchableOpacity style={[styles.btnStyle , {marginRight:props.direction?15:5}]} onPress={showDatepicker}>
+            <TouchableOpacity style={[styles.btnStyle , {marginRight:props.direction?5:5}]} onPress={showDatepicker}>
               <MIcon name="calendar" size={15} color='white' />
               <Text style={{marginRight:0 , fontWeight:'', fontSize:12, color:'white' }}>  {date? date.toLocaleDateString() : 'Date'}</Text>
                 {/* <Icon name="angle-down" size={14} color={'gray'}/> */}

@@ -10,11 +10,39 @@ import { setUserInfo } from '../../../../actions';
 const HomeScreen=(props)=>{
   const [name, setName] = useState(null);
   const [license, setLicense] = useState(null);
+  const [startDate , setStartDate] = useState(new Date());
+  const [endDate , setEndDate] = useState(null);
 
   const [nameError , setNameError] = useState(false);
   const [licenseError , setLicenseError] = useState(false);
 
   const [isLoading , setIsLoading] = useState(false)
+
+  const getUserInfo=async()=>{
+    try{
+      const info = await AsyncStorage.getItem('userInfo')
+      if(info){
+        let userInfo = JSON.parse(info);
+        console.log('User Info ---- '+JSON.stringify(userInfo))
+        
+        setName(userInfo.name)
+        setLicense(userInfo.license)
+        setStartDate(new Date(userInfo.shiftStart))
+        setEndDate(userInfo.shiftEnd? new Date(userInfo.shiftEnd) : null)
+      }
+    }catch(e){
+      console.log('Error getting User Info ----- '+e)
+    }
+    
+  }
+
+  const onChangeStartDate=(type , date)=>{
+    setStartDate(date)
+  }
+
+  const onChangeEndDate=(type , date)=>{
+    setEndDate(date)
+  }
 
   const ErrorMsg=(prop)=>{
     return(
@@ -39,9 +67,10 @@ const HomeScreen=(props)=>{
     }else{
       setIsLoading(true);
       try {
-        props.setUserInfo({name , license})
-        await AsyncStorage.setItem('userInfo', JSON.stringify({name , license}))
-        // props.setUserInfo(JSON.stringify({name , license}))
+        // props.setUserInfo({name , license})
+        await AsyncStorage.setItem('userInfo', JSON.stringify({name , license , 'shiftStart':startDate , 'shiftEnd':endDate}))
+        
+        props.setUserInfo(JSON.stringify({name , license}))
         // props.setStart(true)
       } catch (e) {
         console.log('Error ---- '+e)
@@ -51,6 +80,10 @@ const HomeScreen=(props)=>{
     setIsLoading(false);
     
   }
+
+  useEffect(()=>{
+    getUserInfo()
+  },[])
   
   return (
     // <KeyboardAvoidingView style={{flex:1 , display:'flex' , flexDirection:'column', alignItems:'center', marginTop:'10%'}}>
@@ -84,18 +117,19 @@ const HomeScreen=(props)=>{
           {licenseError && <ErrorMsg msg="*Please Enter License"/>}
         </View>
 
-        <View style={{width:'100%', paddingVertical:8, display:'flex' , flexDirection:'row', alignItems:'center', borderWidth:0, paddingLeft:'8%'}}>
-          <Text style={{color:'black', fontSize:11, width:'20%'}}>Shift Start</Text>
-          <DateTime hideNowButton direction='row'/>
+        <View style={{paddingVertical:8, display:'flex' , flexDirection:'row', alignItems:'center', borderWidth:0, paddingLeft:'0%'}}>
+          <Text style={{color:'black', fontSize:11, marginRight:10}}>Shift Start</Text>
+          <DateTime hideNowButton direction='row' date={startDate} onChangeDate={onChangeStartDate}/>
         </View>
 
-        <View style={{width:'100%', paddingVertical:8, display:'flex' , flexDirection:'row', alignItems:'center', borderWidth:0, paddingLeft:'8%'}}>
-          <Text style={{color:'black', fontSize:11, width:'20%'}}>Shift End</Text>
-          <DateTime hideNowButton direction='row' date={null}/>
+        <View style={{paddingVertical:8, display:'flex' , flexDirection:'row', alignItems:'center', borderWidth:0, paddingLeft:'0%'}}>
+          <Text style={{color:'black', fontSize:11, marginRight:10}}>Shift End  </Text>
+          <DateTime hideNowButton direction='row' date={endDate} onChangeDate={onChangeEndDate}/>
         </View>
 
         <Button 
-          style={{borderRadius:8, marginTop:10, width:'50%', backgroundColor:'#0782F9', opacity:1, height:50, justifyContent:'center'}} mode="contained" onPress={onStart}
+          style={{borderRadius:8, marginTop:10, width:'50%', backgroundColor:'#0782F9', opacity:1, height:50, justifyContent:'center'}} mode="contained" 
+          onPress={onStart}
           loading={isLoading}
           disabled={isLoading}>
           Start
