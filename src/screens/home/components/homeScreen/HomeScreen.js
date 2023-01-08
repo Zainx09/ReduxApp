@@ -32,12 +32,12 @@ const HomeScreen=(props)=>{
         
         setName(userInfo.name)
         setLicense(userInfo.license)
-        setStartDate(new Date(userInfo.shiftStart))
-        setEndDate(userInfo.shiftEnd? new Date(userInfo.shiftEnd) : null)
+        setStartDate(new Date(userInfo.shiftStart) ? new Date(userInfo.shiftStart) : new Date())
+        setEndDate(new Date(userInfo.shiftEnd)? new Date(userInfo.shiftEnd) : null)
 
-        setIsNameDisable(true)
-        setIsLicenseDisable(true)
-        setIsStartDateDisable(true)
+        // setIsNameDisable(true)
+        // setIsLicenseDisable(true)
+        // setIsStartDateDisable(true)
       }
     }catch(e){
       console.log('Error getting User Info ----- '+e)
