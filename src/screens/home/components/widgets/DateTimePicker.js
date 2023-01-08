@@ -60,13 +60,13 @@ export const DateTime = (props) => {
 
         <View style={{display:'flex' , flexDirection:props.direction||'column'}}>
 
-            <TouchableOpacity style={[styles.btnStyle , {marginRight:props.direction?5:5}]} onPress={showDatepicker}>
+            <TouchableOpacity disabled={props.disabled} style={[styles.btnStyle , {marginRight:props.direction?5:5}]} onPress={showDatepicker}>
               <MIcon name="calendar" size={15} color='white' />
               <Text style={{marginRight:0 , fontWeight:'', fontSize:12, color:'white' }}>  {date? date.toLocaleDateString() : 'Date'}</Text>
                 {/* <Icon name="angle-down" size={14} color={'gray'}/> */}
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.btnStyle , {marginRight:5}]} onPress={showTimepicker}>
+            <TouchableOpacity disabled={props.disabled} style={[styles.btnStyle , {marginRight:5}]} onPress={showTimepicker}>
               <MIcon name="camera-timer" size={15} color='white' />
               <Text style={{marginRight:0 , fontWeight:'', fontSize:12, color:'white'}}>  {date? date.toLocaleTimeString() : 'Time'}</Text>
                 {/* <Icon name="angle-down" size={14} color={'gray'}/> */}

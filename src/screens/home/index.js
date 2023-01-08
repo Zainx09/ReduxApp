@@ -96,7 +96,7 @@ const Home = (props) => {
       // setUserInfo()
       props.setUserInfo()
       setDrawerOpen(false);
-      await AsyncStorage.removeItem('userInfo')
+      // await AsyncStorage.removeItem('userInfo')
     } catch(e) {
       console.log("Error -----"+e)
     }
@@ -107,6 +107,10 @@ const Home = (props) => {
   },[])
 
   useEffect(()=>{
+    setUserInfo(props.userInfo)
+  },[props.userInfo])
+
+  useEffect(()=>{
     // console.log('GEO --- '+props.deviceInfo)
     if(props.deviceInfo){
       // FetchDeviceDetails();
@@ -115,10 +119,10 @@ const Home = (props) => {
 
   const Sidebar=()=>(
       <View style={{height:'100%' , width:'100%' , borderWidth:0, display:'flex' , flexDirection:'column', opacity:0.8, paddingVertical:10}}>
-        {props.userInfo && 
+        {userInfo && 
           // <View style={{borderBottomWidth:1, borderColor:'lightgray', paddingLeft:12, marginBottom:10, marginHorizontal:5, paddingVertical:5, backgroundColor:'lightgray', borderRadius:10}}>
           <View style={{display:'flex',flexDirection:'column', borderBottomWidth:1, borderColor:'lightgray', paddingLeft:12, marginBottom:15, marginHorizontal:5, paddingVertical:15}}>
-            <Text style={{fontSize:16 , color:'black' , fontStyle:'', fontWeight:'bold'}}>{props.userInfo.name?.toUpperCase()}</Text>
+            <Text style={{fontSize:16 , color:'black' , fontStyle:'', fontWeight:'bold'}}>{userInfo.name?.toUpperCase()}</Text>
             <Text style={{fontSize:14 , color:'black' , fontStyle:'italic', fontWeight:'450'}}>{props.user.email}</Text>
 
             {props.deviceInfo && <View style={{display:'flex' , flexDirection:'column', marginTop:5, borderWidth:0}}>
@@ -174,7 +178,7 @@ const Home = (props) => {
     <Loader /> :
     <ApplicationProvider {...eva} theme={eva.light}>
       <View style={{flex:1}}>
-        {(!props.userInfo) ? <HomeScreen/> :
+        {(!userInfo) ? <HomeScreen/> :
 
           <Drawer
             sidebar={<Sidebar />}
@@ -220,7 +224,8 @@ const mapStateToProps = (state) =>{
   return {
       user: state.user,
       loading:state.loading,
-      deviceInfo:state.deviceInfo
+      deviceInfo:state.deviceInfo,
+      userInfo:state.userInfo
 
     }
 }

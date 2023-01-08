@@ -12,6 +12,11 @@ const HomeScreen=(props)=>{
   const [license, setLicense] = useState(null);
   const [startDate , setStartDate] = useState(new Date());
   const [endDate , setEndDate] = useState(null);
+  const [isNameDisable , setIsNameDisable] = useState(false);
+  const [isLicenseDisable , setIsLicenseDisable] = useState(false);
+  const [isStartDateDisable , setIsStartDateDisable] = useState(false);
+
+  
 
   const [nameError , setNameError] = useState(false);
   const [licenseError , setLicenseError] = useState(false);
@@ -29,6 +34,10 @@ const HomeScreen=(props)=>{
         setLicense(userInfo.license)
         setStartDate(new Date(userInfo.shiftStart))
         setEndDate(userInfo.shiftEnd? new Date(userInfo.shiftEnd) : null)
+
+        setIsNameDisable(true)
+        setIsLicenseDisable(true)
+        setIsStartDateDisable(true)
       }
     }catch(e){
       console.log('Error getting User Info ----- '+e)
@@ -67,10 +76,9 @@ const HomeScreen=(props)=>{
     }else{
       setIsLoading(true);
       try {
-        // props.setUserInfo({name , license})
         await AsyncStorage.setItem('userInfo', JSON.stringify({name , license , 'shiftStart':startDate , 'shiftEnd':endDate}))
         
-        props.setUserInfo(JSON.stringify({name , license}))
+        props.setUserInfo({name , license})
         // props.setStart(true)
       } catch (e) {
         console.log('Error ---- '+e)
@@ -93,19 +101,21 @@ const HomeScreen=(props)=>{
 
         <View style={{display:'flex', borderWidth:0, width:'70%', marginVertical:10}}>
           <TextInput
+            disabled={isNameDisable}
             outlineStyle={{borderRadius:5}}
             dense
-          label="Name"
-          mode='outlined'
-          value={name}
-          onChangeText={setName}
-          // style={{height:40}}
+            label="Name"
+            mode='outlined'
+            value={name}
+            onChangeText={setName}
+            // style={{height:40}}
         />
           {nameError && <ErrorMsg msg="*Please Enter Name"/>}
         </View>
 
         <View style={{display:'flex', borderWidth:0, width:'70%', marginTop:0}}>
           <TextInput
+            disabled={isLicenseDisable}
             outlineStyle={{borderRadius:5}}
             dense
             label="License"
@@ -119,7 +129,7 @@ const HomeScreen=(props)=>{
 
         <View style={{paddingVertical:8, display:'flex' , flexDirection:'row', alignItems:'center', borderWidth:0, paddingLeft:'0%'}}>
           <Text style={{color:'black', fontSize:11, marginRight:10}}>Shift Start</Text>
-          <DateTime hideNowButton direction='row' date={startDate} onChangeDate={onChangeStartDate}/>
+          <DateTime disabled={isStartDateDisable} hideNowButton direction='row' date={startDate} onChangeDate={onChangeStartDate}/>
         </View>
 
         <View style={{paddingVertical:8, display:'flex' , flexDirection:'row', alignItems:'center', borderWidth:0, paddingLeft:'0%'}}>
@@ -128,7 +138,7 @@ const HomeScreen=(props)=>{
         </View>
 
         <Button 
-          style={{borderRadius:8, marginTop:10, width:'50%', backgroundColor:'#0782F9', opacity:1, height:50, justifyContent:'center'}} mode="contained" 
+          style={{borderRadius:8, marginTop:10, width:'70%', backgroundColor:'#0782F9', opacity:0.8, height:50, justifyContent:'center'}} mode="contained" 
           onPress={onStart}
           loading={isLoading}
           disabled={isLoading}>
