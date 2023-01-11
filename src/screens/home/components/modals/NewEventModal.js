@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { ScrollView, Text, View, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native'
-import { TextInput, RadioButton} from 'react-native-paper';
+import { ScrollView, Text, View, Dimensions, StyleSheet, TouchableOpacity, Alert, TextInput } from 'react-native'
+import { RadioButton} from 'react-native-paper';
 import {
     Provider,
     Button,
@@ -64,6 +64,8 @@ const NewEventModal=(props)=>{
     const [detailsError , setDetailsError] = useState(false);
     const [eventData, setEventData] = useState({});
     const [progressCounter , setProgressCounter] = useState(0)
+    const progressCounterRef = React.useRef(0);
+
     const [isLoading , setIsLoading] = useState(false)
 
     const ErrorMsg=(props)=>{
@@ -103,7 +105,9 @@ const NewEventModal=(props)=>{
         uploadTask.on('state_changed', (snapshot) => {
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log('Upload is ' + progress + '%');
-            setProgressCounter(progress)
+            // setProgressCounter(progress)
+            // progressCounterRef.current = progress    
+
             switch (snapshot.state) {
               case 'paused':
                 console.log('Upload is paused');
@@ -122,18 +126,18 @@ const NewEventModal=(props)=>{
         () => {
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
               setImageUrl(downloadURL)
-              let eventObj = {
-                uid:props.user.uid,
-                dateTime,
-                // name,
-                // license,
-                eventType,
-                eventDetail,
-                "imageUrl":downloadURL,
-                eventStatus
-                }
-                setEventData(eventObj)
-                props.saveEvent(eventObj)
+            //   let eventObj = {
+            //     uid:props.user.uid,
+            //     dateTime,
+            //     // name,
+            //     // license,
+            //     eventType,
+            //     eventDetail,
+            //     "imageUrl":downloadURL,
+            //     eventStatus
+            //     }
+            //     setEventData(eventObj)
+            //     props.saveEvent(eventObj)
             });
           }
         )
@@ -161,30 +165,63 @@ const NewEventModal=(props)=>{
         // props.setEventsModalLoading(true);
         setIsLoading(true)
 
-        if(imageName){
-            UploadImage();
-        }else{
-            let eventObj = {
-                uid:props.user.uid,
-                dateTime,
-                // name,
-                // license,
-                eventType,
-                eventDetail,
-                "imageUrl":null,
-                eventStatus
-            }
-            setEventData(eventObj)
-            props.saveEvent(eventObj)
-            
-        }
+        // if(imageName){
+        //     UploadImage();
+        // }else{
+        //     let eventObj = {
+        //         uid:props.user.uid,
+        //         dateTime,
+        //         // name,
+        //         // license,
+        //         eventType,
+        //         eventDetail,
+        //         "imageUrl":imageUrl,
+        //         eventStatus
+        //     }
+        //     setEventData(eventObj)
+        //     props.saveEvent(eventObj)
+        // }
 
-        // props.setEventsModalLoading(false);
+        let eventObj = {
+            uid:props.user.uid,
+            dateTime,
+            // name,
+            // license,
+            eventType,
+            eventDetail,
+            "imageUrl":imageUrl,
+            eventStatus
+        }
+        setEventData(eventObj)
+        props.saveEvent(eventObj)
+
         onClose();
 
 
         // setVisible(false)
         // props.openEventModal(false)
+    }
+
+    const onCancel = () => {
+        // setVisible(false)
+        setDateTime(new Date())
+        setImageName(null)
+        setImageUrl(null)
+
+        setEventType('Patrol')
+        setEventDetail(null)
+        setEventStatus('Complete')
+        setNameError(false)
+        setLicenseError(false)
+        setDetailsError(false)
+        setEventData({})
+        setIsLoading(false)
+
+        progressCounterRef.current = 0
+
+        // setVisible(false)
+        // props.openEventModal(false)
+        // setIsLoading(false);
     }
   
     const onClose = () => {
@@ -194,9 +231,32 @@ const NewEventModal=(props)=>{
     }
 
     useEffect(()=>{
+        if(imageName){
+            // UploadImage();
+        }
+
+        // setTimeout
+    },[imageName])
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // console.log('Logs every minute');
+            if(imageName){
+                if(progressCounterRef.current<100){
+                    progressCounterRef.current += 10
+                    console.log(progressCounterRef.current)
+                }
+                
+            }
+        }, 700);
+
+        return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+    }, [imageName])
+
+
+    useEffect(()=>{
         setVisible(props.openNewEventModal)
     },[props.openNewEventModal])
-
 
   
     return (
@@ -205,8 +265,8 @@ const NewEventModal=(props)=>{
         
         
         <Modal
-            style={{ width:(Dimensions.get('window').width)-50, borderWidth:0.5, borderColor:'gray', borderRadius:15, marginBottom:'0%', backgroundColor:'white', paddingVertical:10, opacity:0.95}}
-            title="Title"
+            style={{ width:(Dimensions.get('window').width)-50, borderWidth:0.5, borderColor:'gray', borderRadius:15, marginBottom:'0%', backgroundColor:'white', paddingBottom:10, opacity:0.95}}
+            // title="Title"
             transparent
             onClose={onClose}
             //   maskClosable
@@ -218,7 +278,10 @@ const NewEventModal=(props)=>{
             
             <ScrollView>
                 <View style={{display:'flex', flexDirection:'column', alignItems:'center', borderWidth:0, marginVertical:0 , height:'100%'}}>
-                    <View style={{}}>
+                    <View style={{borderWidth:0 , paddingHorizontal:30 , paddingVertical:8 , borderRadius:5 , opacity:1}}>
+                        <Text style={{ textAlign: 'center' , fontSize:16 , fontWeight:'bold', color:'black'}}>TITLE</Text>
+                    </View>
+                    <View style={{marginTop:5}}>
                         {/* <Text style={{ textAlign: 'center' , fontSize:12 }}>Your IP 1.1.1.1 ON Android From NSW, AU</Text> */}
                         {props.deviceInfo && <Text style={{ textAlign: 'center' , fontSize:12 }}>Your IP {props.deviceInfo?.ip?props.deviceInfo.ip:'None'} ON Android From {props.deviceInfo?.region +', '+props.deviceInfo?.country}</Text>}
                     </View>
@@ -228,7 +291,7 @@ const NewEventModal=(props)=>{
                             <Text style={styles.TitleStyle}>DATETIME</Text>
                         </View>
                         <View style={{display:'flex', width:'70%'}}>
-                            <DateTime date={dateTime} onChangeDate={(event , value)=>onChangeEventData(event , value)}/>
+                            <DateTime direction='row' hideNowButton date={dateTime} onChangeDate={(event , value)=>onChangeEventData(event , value)}/>
                         </View>
                     </View>
 
@@ -270,9 +333,9 @@ const NewEventModal=(props)=>{
                             <Text style={styles.TitleStyle}>IMAGE</Text>
                         </View>
                         <View style={{display:'flex', borderWidth:0, width:'70%'}}>
+                            {/* <ImageUploader setImageName={setImageName}/> */}
                             <ImageUploader setImageName={setImageName}/>
-                            {/* { (progressCounter==100 || progressCounter==0 ) && <ImageUploader setImageName={setImageName}/>}
-                            { (progressCounter==100 && progressCounter>0 ) && <ProgressBar progress={progressCounter} color={'#3CB371'} />} */}
+                            <ProgressBar progress={progressCounterRef.current} color={'#3CB371'} />
                         </View>
                     </View>
 
@@ -315,18 +378,11 @@ const NewEventModal=(props)=>{
                             <Text style={styles.TitleStyle}>EVENT DETAIL</Text>
                         </View>
                         <View style={{display:'flex', borderWidth:0, width:'70%'}}>
-                            {/* <TextInput
-                                style={{fontSize:12}}
-                                placeholder='Details'
-                                value={eventDetail}
-                                onChangeText={(value)=>onChangeEventData('eventDetail' , value)}
-                                mode='outlined'
-                                multiline
-                                /> */}
                             <Input
-                                style={{ borderWidth:0.5, borderColor:'lightgray'}}
-                                size='medium'
+                                style={{  borderWidth:0.5, borderColor:'lightgray'}}
                                 multiline={true}
+                                textStyle={{ minHeight:70 }}
+                                // size='medium'
                                 placeholder='Enter Details'
                                 value={eventDetail}
                                 onChangeText={(value)=>onChangeEventData('eventDetail' , value)}
@@ -379,7 +435,7 @@ const NewEventModal=(props)=>{
                         </TouchableOpacity>
                         <TouchableOpacity 
                             style={{display:'flex', justifyContent:'center', alignItems:'center', width:'33%', height:40 , borderWidth:0, backgroundColor:'maroon', borderRadius:8, opacity:0.9}}
-                            onPress={onClose}
+                            onPress={onCancel}
                             >
                             <Text style={{color:'white' , fontWeight:'bold'}}>Cancel</Text>
                         </TouchableOpacity>

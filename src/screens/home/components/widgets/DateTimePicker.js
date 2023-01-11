@@ -56,7 +56,7 @@ export const DateTime = (props) => {
     };
   
     return (
-      <View style={{display:'flex' , flexDirection:'row',borderWidth:0}}>
+      <View style={{display:'flex' , flexDirection:'column',borderWidth:0}}>
 
         <View style={{display:'flex' , flexDirection:props.direction||'column'}}>
 
@@ -74,8 +74,8 @@ export const DateTime = (props) => {
 
         </View>
 
-        {!props.hideNowButton && <View style={{display:'flex' , flexDirection:'column', justifyContent:'flex-end', marginLeft:5}}>
-            <TouchableOpacity style={[styles.btnStyle , {minWidth:50, backgroundColor:'darkcyan', borderWidth:0}]} onPress={()=>setDate(new Date())}>
+        {!props.hideNowButton && <View style={{display:'flex' , flexDirection:'column', justifyContent:'flex-end', marginLeft:0}}>
+            <TouchableOpacity style={[styles.btnStyle , {width:50 , minWidth:50, backgroundColor:'darkcyan', borderWidth:0}]} onPress={()=>setDate(new Date())}>
                 <Text style={{fontWeight:'bold', fontSize:12, color:'white'}}>Now</Text>
             </TouchableOpacity>
         </View>}
