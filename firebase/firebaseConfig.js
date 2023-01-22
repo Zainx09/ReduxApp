@@ -19,12 +19,12 @@ import { getAnalytics } from "firebase/analytics";
 // };
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCYO0pm2ZsKa8dUmK8z164xLx7Usj-tcyU",
+  apiKey: "apiKey",
   authDomain: "react-native-logs.firebaseapp.com",
   projectId: "react-native-logs",
   storageBucket: "react-native-logs.appspot.com",
   messagingSenderId: "204109714442",
-  appId: "1:204109714442:web:eedfcbd056113723c0fbf3",
+  appId: "appId",
   measurementId: "G-FR4PS8EJKQ"
 };
 
